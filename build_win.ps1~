@@ -24,20 +24,20 @@ if ($shFiles.Count -eq 0) {
 foreach ($shFile in $shFiles) {
     $basename = $shFile.BaseName
     $targetSh = Join-Path $binDir "$basename.sh"
-    $targetPs1 = Join-Path $binDir "$basename.ps1"
+    $targetBat = Join-Path $binDir "$basename.bat"
 
     # .sh ファイルをコピー
     Copy-Item -Path $shFile.FullName -Destination $targetSh -Force
 
-    # .ps1 ファイルを生成（busybox64u 経由で .sh を実行）
-    $ps1Content = @"
-`$scriptPath = Join-Path `$PSScriptRoot "$basename.sh"
-busybox64u sh `$scriptPath @args
+    # .bat ファイルを生成（busybox64u 経由で .sh を実行）
+    $batContent = @"
+@echo off
+busybox64u sh "%~dp0$basename.sh" %*
 "@
 
-    Set-Content -Path $targetPs1 -Value $ps1Content -Encoding UTF8 
+    Set-Content -Path $targetBat -Value $batContent -Encoding UTF8BOM 
 
-    Write-Host "生成: $basename.ps1 -> $basename.sh"
+    Write-Host "生成: $basename.bat -> $basename.sh"
 }
 
 # 結果表示
