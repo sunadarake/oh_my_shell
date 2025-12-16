@@ -1,0 +1,54 @@
+#!/usr/bin/env pwsh
+# oh_my_shell Windows ビルドスクリプト
+# scripts/ のシェルスクリプトを .bin_win/ にコピーし、
+# busybox64u 経由で実行する .bat ファイルを生成する
+
+# ディレクトリ設定
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$srcDir = Join-Path $scriptDir "scripts"
+$binDir = Join-Path $scriptDir ".bin_win"
+
+# ビルドディレクトリ作成
+if (-not (Test-Path $binDir)) {
+    New-Item -ItemType Directory -Path $binDir | Out-Null
+}
+
+# シェルスクリプトを処理
+$shFiles = Get-ChildItem -Path $srcDir -Filter "*.sh" -ErrorAction SilentlyContinue
+
+if ($shFiles.Count -eq 0) {
+    Write-Host "警告: $srcDir に .sh ファイルが見つかりません" -ForegroundColor Yellow
+    exit 1
+}
+
+foreach ($shFile in $shFiles) {
+    $basename = $shFile.BaseName
+    $targetSh = Join-Path $binDir "$basename.sh"
+    $targetBat = Join-Path $binDir "$basename.bat"
+
+    # .sh ファイルをコピー
+    Copy-Item -Path $shFile.FullName -Destination $targetSh -Force
+
+    # .bat ファイルを生成（busybox64u 経由で .sh を実行）
+    $batContent = @"
+@echo off
+busybox64u sh "%~dp0$basename.sh" %*
+"@
+
+    Set-Content -Path $targetBat -Value $batContent -Encoding ASCII
+
+    Write-Host "生成: $basename.bat -> $basename.sh"
+}
+
+# 結果表示
+Write-Host ""
+Write-Host "ビルド完了" -ForegroundColor Green
+Write-Host ""
+Write-Host "使用するには以下を環境変数 PATH に追加してください:"
+Write-Host ""
+Write-Host "  $binDir" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "または PowerShell プロファイルに以下を追加:"
+Write-Host ""
+Write-Host "  `$env:PATH = `"$binDir;`$env:PATH`"" -ForegroundColor Cyan
+Write-Host ""
