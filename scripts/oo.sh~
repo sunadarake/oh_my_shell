@@ -16,7 +16,7 @@ case "$(uname -s)" in
     Darwin*)
         open "$d"
         ;;
-    MINGW*|Windows*)
+    MINGW*)
         explorer.exe "$d"
         ;;
     *)
