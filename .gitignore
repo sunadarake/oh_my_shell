@@ -1,2 +1,8 @@
 # bin dir
 .bin*/
+
+# vim temp
+*.swp
+*.swo
+*.swn
+*.un~
