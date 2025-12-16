@@ -45,26 +45,32 @@ tt .claude/settings.json src/main.js
 tt bin/oreore/
 ```
 
-### gc - Gitコミット
+### oo - exploerを開く(OSに適した形で)
+
+```bash
+oo /path/to/open
+```
+
+### ggc - Gitコミット
 
 `git add .` と `git commit` をまとめて実行します。
 
 ```bash
 # デフォルトメッセージ "update" でコミット
-gc
+ggc
 
 # カスタムメッセージでコミット
-gc "READMEの修正" "バグ修正"
+ggc "READMEの修正" "バグ修正"
 ```
 
-### gp - Git プッシュ
+### ggp - Git プッシュ
 
 `git push origin main` を実行します。
 
 ```bash
 # origin main にプッシュ
-gp
+ggp
 
 # カスタムオプション指定
-gp origin feature-branch
+ggp origin feature-branch
 ```
