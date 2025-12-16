@@ -1,5 +1,5 @@
 #!/bin/sh
-# gp- git push origin main　をするためのコマンド
+# ggp- git push origin main　をするためのコマンド
 if ! command -v git >/dev/null 2>&1; then
   echo "ERROR: git is NOT installed"
   exit 1

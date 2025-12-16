@@ -1,6 +1,6 @@
 #!/bin/sh
-# gc - git add . && git commit -m "update"をするコマンド
-#   gc "readmeの修正" "jsの改善" などのように
+# ggc - git add . && git commit -m "update"をするコマンド
+#   ggc "readmeの修正" "jsの改善" などのように
 #   引数を入れることでコミットメッセージを追加できる
 
 if ! command -v  git >/dev/null 2>&1; then
