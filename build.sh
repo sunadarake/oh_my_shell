@@ -4,8 +4,8 @@
 
 # ディレクトリ設定
 script_dir=$(cd "$(dirname "$0")" && pwd)
-src_dir="${script_dir}/bin"
-bdir="${script_dir}/build/unix"
+src_dir="${script_dir}/scripts"
+bdir="${script_dir}/.bin"
 
 # ビルドディレクトリ作成
 mkdir -p "$bdir" || exit 1
