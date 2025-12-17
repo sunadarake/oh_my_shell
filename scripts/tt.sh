@@ -10,7 +10,7 @@ do
       echo "mkdir $f"
       ;;
     *)
-      d = $(dirname "$f")
+      d=$(dirname "$f")
       mkdir -p "$d" && touch "$f"
       echo "touch $f"
       ;;
