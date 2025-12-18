@@ -4,6 +4,7 @@
 
 use strict;
 use warnings;
+use utf8;
 use X;
 
 # .claude/settings.json の作成
