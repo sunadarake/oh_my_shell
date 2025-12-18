@@ -5,7 +5,7 @@
 
 # ディレクトリ設定
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$srcDir = Join-Path $scriptDir "scripts"
+$srcDir = Join-Path $scriptDir "shell"
 $binDir = Join-Path $scriptDir ".bin_win"
 
 # ビルドディレクトリ作成

@@ -4,7 +4,7 @@
 
 # ディレクトリ設定
 script_dir=$(cd "$(dirname "$0")" && pwd)
-src_dir="${script_dir}/scripts"
+src_dir="${script_dir}/shell"
 bdir="${script_dir}/.bin"
 
 # ビルドディレクトリ作成
