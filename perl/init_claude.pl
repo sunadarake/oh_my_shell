@@ -30,8 +30,8 @@ unless (-f $settings_file) {
     print "Created: $settings_file\n";
 }
 
-# .CLAUDE.md の作成
-my $claude_md = '.CLAUDE.md';
+# CLAUDE.md の作成
+my $claude_md = 'CLAUDE.md';
 unless (-f $claude_md) {
     my $content = <<'MD';
 <<ここにプロジェクトの名前を入れる>>
