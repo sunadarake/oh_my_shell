@@ -1,11 +1,12 @@
 #!/usr/bin/env pwsh
 # oh_my_shell Windows ビルドスクリプト
-# scripts/ のシェルスクリプトを .bin_win/ にコピーし、
-# busybox64u 経由で実行する .bat ファイルを生成する
+# shell/ のシェルスクリプトを .bin_win/ にコピーし、busybox64u 経由で実行する .ps1 ファイルを生成
+# perl/ の Perl スクリプトを .bin_win/ にコピーし、perl -CAS 経由で実行する .ps1 ファイルを生成
 
 # ディレクトリ設定
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$srcDir = Join-Path $scriptDir "shell"
+$shellDir = Join-Path $scriptDir "shell"
+$perlDir = Join-Path $scriptDir "perl"
 $binDir = Join-Path $scriptDir ".bin_win"
 
 # ビルドディレクトリ作成
@@ -14,11 +15,10 @@ if (-not (Test-Path $binDir)) {
 }
 
 # シェルスクリプトを処理
-$shFiles = Get-ChildItem -Path $srcDir -Filter "*.sh" -ErrorAction SilentlyContinue
+$shFiles = Get-ChildItem -Path $shellDir -Filter "*.sh" -ErrorAction SilentlyContinue
 
 if ($shFiles.Count -eq 0) {
-    Write-Host "警告: $srcDir に .sh ファイルが見つかりません" -ForegroundColor Yellow
-    exit 1
+    Write-Host "警告: $shellDir に .sh ファイルが見つかりません" -ForegroundColor Yellow
 }
 
 foreach ($shFile in $shFiles) {
@@ -38,6 +38,32 @@ busybox64u sh `$scriptPath @args
     Set-Content -Path $targetPs1 -Value $ps1Content -Encoding UTF8 
 
     Write-Host "生成: $basename.ps1 -> $basename.sh"
+}
+
+# Perlスクリプトを処理
+$plFiles = Get-ChildItem -Path $perlDir -Filter "*.pl" -ErrorAction SilentlyContinue
+
+if ($plFiles.Count -eq 0) {
+    Write-Host "警告: $perlDir に .pl ファイルが見つかりません" -ForegroundColor Yellow
+}
+
+foreach ($plFile in $plFiles) {
+    $basename = $plFile.BaseName
+    $targetPl = Join-Path $binDir "$basename.pl"
+    $targetPs1 = Join-Path $binDir "$basename.ps1"
+
+    # .pl ファイルをコピー
+    Copy-Item -Path $plFile.FullName -Destination $targetPl -Force
+
+    # .ps1 ファイルを生成（perl -CAS 経由で .pl を実行）
+    $ps1Content = @"
+`$scriptPath = Join-Path `$PSScriptRoot "$basename.pl"
+perl -CAS `$scriptPath @args
+"@
+
+    Set-Content -Path $targetPs1 -Value $ps1Content -Encoding UTF8
+
+    Write-Host "生成: $basename.ps1 -> $basename.pl"
 }
 
 # 結果表示

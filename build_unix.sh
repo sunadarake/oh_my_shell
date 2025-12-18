@@ -4,20 +4,31 @@
 
 # ディレクトリ設定
 script_dir=$(cd "$(dirname "$0")" && pwd)
-src_dir="${script_dir}/shell"
+shell_dir="${script_dir}/shell"
+perl_dir="${script_dir}/perl"
 bdir="${script_dir}/.bin"
 
 # ビルドディレクトリ作成
 mkdir -p "$bdir" || exit 1
 
 # シェルスクリプトを処理
-for sh_file in "$src_dir"/*.sh; do
+for sh_file in "$shell_dir"/*.sh; do
   [ -e "$sh_file" ] || continue
 
   basename=$(basename "$sh_file" .sh)
   target="${bdir}/${basename}"
 
   cp "$sh_file" "$target" && chmod +x "$target"
+done
+
+# Perlスクリプトを処理（拡張子なし）
+for pl_file in "$perl_dir"/*.pl; do
+  [ -e "$pl_file" ] || continue
+
+  basename=$(basename "$pl_file" .pl)
+  target="${bdir}/${basename}"
+
+  cp "$pl_file" "$target" && chmod +x "$target"
 done
 
 # 結果表示
