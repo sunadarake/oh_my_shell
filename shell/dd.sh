@@ -1,5 +1,5 @@
 #!/bin/bash
-# cll - ターミナル画面をクリア
+# dd - ターミナル画面をクリア
 
 case "$(uname -s)" in
     Linux*)
