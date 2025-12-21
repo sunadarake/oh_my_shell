@@ -1,13 +1,9 @@
-# perl/init_python_scripts.pl を作成する。
+以下のスクリプトを書いて。
 
-Pythonのスクリプト群を作るプロジェクトの雛形を作る。
+## shell/vvp.sh
 
-引数には１つ受け取る。
-その引数がpythonscriptのプロジェクト名になる。
-以下の処理を書くこと。
+profileを vimで開く。 linuxであれば、 ~/.bashrc windowsであれば $PROFILE 、macは　.zshrc を開く
 
-- doc/X.md に記載がある X moduleを使うこと。
-- uv があるかチェックする
-- uv init --package sample_project を実行する
-- cd をする。　perl/init_claude.plと同じように CLAUDE.mdと.claude/settings.jsonを作成する。
-- CLAUDE.mdは doc/claude_script.mdと同じようにすること。
+## shell/vvu.sh
+
+. ~/.bashrc のように先程の設定を更新する これも win, mac, linuxで

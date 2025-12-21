@@ -6,6 +6,7 @@
 os=$(uname -s)
 case "$os" in
   Linux*)
+    sudo apt-get update 
     sudo apt upgrade google-chrome-stable -y
     ;;
   *)
