@@ -200,4 +200,11 @@ MD
     print "Created: $claude_md\n";
 }
 
+# python3.12をインストール
+sh('uv', 'python', 'install', '3.12');
+sh('uv', 'python', 'pin', '3.12');
+
+# 基本的なモジュールをインストールしておく
+sh('uv', 'add', 'requests', 'pillow');
+
 print "Finish Complete\n"
