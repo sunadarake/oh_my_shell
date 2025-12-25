@@ -1,13 +1,13 @@
 #!/bin/bash
-# oo - ƒNƒƒXƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ÅƒGƒNƒXƒvƒ[ƒ‰[‚ğŠJ‚­
+# oo - æŒ‡å®šã—ãŸãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ã‚¨ã‚¯ã‚¹ãƒ—ãƒ­ãƒ¼ãƒ©ãƒ¼ã§é–‹ã
+# oo /path/to/dir oo ./
+# å¼•æ•°ã‚’çœç•¥ã—ãŸå ´åˆã¯ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’é–‹ã
 
-# ˆø”ƒ`ƒFƒbƒN
 if [ $# -eq 0 ]; then
-    echo "usage: oo <dir>"
-    exit 1
+  d=$(pwd)
+else
+  d="$1"
 fi
-
-d="$1"
 
 case "$(uname -s)" in
     Linux*)
@@ -24,3 +24,4 @@ case "$(uname -s)" in
         exit 1
         ;;
 esac
+
