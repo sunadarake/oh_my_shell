@@ -1,9 +1,18 @@
-以下のスクリプトを書いて。
 
-## shell/vvp.sh
+perl/az.pl　を書いて。内容は以下の通り。
 
-profileを vimで開く。 linuxであれば、 ~/.bashrc windowsであれば $PROFILE 、macは　.zshrc を開く
+az 14 a 56 
+とかで暗算ができるスクリプト
 
-## shell/vvu.sh
+与えられた引数を evalで評価して 最終的に print  で返す。
 
-. ~/.bashrc のように先程の設定を更新する これも win, mac, linuxで
+特殊な文字列は以下の通り
+
+a +
+s -
+m *
+d /
+
+他にも便利な文字列があれば追加してよい。
+
+
