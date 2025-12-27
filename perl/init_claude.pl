@@ -33,8 +33,8 @@ unless (-f $settings_file) {
 
 # CLAUDE.md の作成
 my $claude_md = 'CLAUDE.md';
-unless (-f $claude_md) {
-    my $content = <<'MD';
+my $agent_md = 'AGENTS.md';
+my $content = <<'MD';
 <<ここにプロジェクトの名前を入れる>>
 
 <<ここにプロジェクトの概要を２，３行程度で入れる>>
@@ -49,8 +49,15 @@ unless (-f $claude_md) {
 
 bashを使わずにbusyboxを使う様にしてください。
 MD
+
+unless (-f $claude_md) {
     fp($claude_md, $content);
     print "Created: $claude_md\n";
+}
+
+unless (-f $agent_md) {
+    fp($agent_md, $content);
+    print "Created: $agent_md\n";
 }
 
 print "Finish Complete\n"
