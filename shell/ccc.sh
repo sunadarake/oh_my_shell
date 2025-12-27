@@ -30,9 +30,18 @@ esac
 
 # 標準入力からか引数からかを判定
 if [ -t 0 ]; then
-    # パイプなし、引数を使用
-    printf '%s' "$*" | $cmd
+    # パイプなし、引数をファイル名として扱う
+    if [ -z "$1" ]; then
+        echo "Error: No file specified" >&2
+        exit 1
+    fi
+    if [ ! -f "$1" ]; then
+        echo "Error: File not found: $1" >&2
+        exit 1
+    fi
+    cat "$1" | $cmd
 else
     # パイプから読み込み
     $cmd
 fi
+
