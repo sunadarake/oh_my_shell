@@ -4,6 +4,7 @@
 
 use strict;
 use warnings;
+use utf8;
 use X;
 
 my $claude_file = 'CLAUDE.md';
