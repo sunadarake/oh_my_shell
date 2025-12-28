@@ -13,10 +13,10 @@ unless (-f $settings_file) {
     md('.claude');
 
     my @commands = qw(rg mkdir grep cp chmod chown find cat head tail less more wc sort uniq cut awk sed ls);
-    my @prefixes = ('', 'busybox', 'busybox64u');
+    my @prefixes = ('', 'busybox ', 'busybox64u ');
     my @allow = map {
         my $prefix = $_;
-        map { "Bash($prefix $_:*)" } @commands;
+        map { "Bash(${prefix}$_:*)" } @commands;
     } @prefixes;
 
     push @allow, "Bash(git add:*)", "List(*)", "Edit(*)", "mcp__voicevox__speak";
