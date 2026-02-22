@@ -12,14 +12,21 @@ my $settings_file = '.claude/settings.json';
 unless (-f $settings_file) {
     md('.claude');
 
-    my @commands = qw(rg mkdir grep cp chmod chown find cat head tail less more wc sort uniq cut awk sed ls);
+    my @commands = qw(
+        rg grep egrep fgrep
+        mkdir cp mv touch chmod chown find
+        cat head tail less more wc sort uniq cut awk sed tee
+        ls stat file diff du df
+        which whereis
+        pwd
+    );
     my @prefixes = ('', 'busybox ', 'busybox64u ');
     my @allow = map {
         my $prefix = $_;
         map { "Bash(${prefix}$_:*)" } @commands;
     } @prefixes;
 
-    push @allow, "Bash(git add:*)", "List(*)", "Edit(*)", "mcp__voicevox__speak";
+    push @allow, "Bash(git add:*)", "List(*)", "Edit(*)", "Write(*)", "mcp__voicevox__speak";
 
     my $settings = {
         permissions => {
@@ -41,9 +48,9 @@ my $content = <<'MD';
 
 ## プロジェクトの取り組み方について
 
-* なるべくコードやコメントをシンプルに簡潔にすること。 
-* コメントはUTF-8の日本語で書くこと。 
-* 問題に取り組む前に、コードや仕様を読んで理解すること。 
+* なるべくコードやコメントをシンプルに簡潔にすること。
+* コメントはUTF-8の日本語で書くこと。
+* 問題に取り組む前に、コードや仕様を読んで理解すること。
 
 ## Bashについて
 
