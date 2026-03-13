@@ -13,8 +13,8 @@ my $todo_dir;
 
 if (bn($cwd) eq 'todo') {
     $todo_dir = $cwd;
-} elsif (-d dn($cwd) . '/todo') {
-    $todo_dir = dn($cwd) . '/todo';
+} elsif (-d $cwd . '/todo') {
+    $todo_dir = $cwd . '/todo';
 }
 
 unless ($todo_dir) {
