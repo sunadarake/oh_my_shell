@@ -31,10 +31,19 @@ if (@ARGV == 1) {
     die "Usage: create_todo.pl [枚数]\n";
 }
 
-# 既存の連番ファイルから次の番号を決める
-opendir(my $dh, $todo_dir) or die "ディレクトリを開けません: $!\n";
-my @existing = grep { /^\d{3}-todo\.md$/ } readdir($dh);
-closedir($dh);
+# 既存の連番ファイルから次の番号を決める（サブディレクトリも含む）
+my @existing;
+my @dirs = ($todo_dir);
+while (my $dir = shift @dirs) {
+    opendir(my $dh, $dir) or die "ディレクトリを開けません: $!\n";
+    for my $entry (readdir($dh)) {
+        next if $entry eq '.' || $entry eq '..';
+        my $path = "$dir/$entry";
+        push @dirs, $path if -d $path;
+        push @existing, $entry if $entry =~ /^\d{3}-todo\.md$/;
+    }
+    closedir($dh);
+}
 
 my $next = 1;
 if (@existing) {
