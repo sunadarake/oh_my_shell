@@ -7,11 +7,14 @@ IGNORE="
 node_modules|.dart_tool|.flutter-plugins*|
 __pycache__|.venv|venv|env|*.egg-info|.pytest_cache|
 vendor|
-blib|.build|
+blib|.build|local|
 build|dist|out|target|cmake-build-*|
 .next|.nuxt|.cache|
 .gradle|Pods|DerivedData|
-.git
+.git|
+.vscode|.claude|.zed|
+android|linux|ios|win|web|
+todo
 "
 # 改行・スペースを除去して1行の|区切りにする
 IGNORE=$(printf '%s' "$IGNORE" | tr -d ' \n')
