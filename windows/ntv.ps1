@@ -32,18 +32,18 @@ if ($todoFiles) {
     $content = Get-Content $latest.FullName -Raw -ErrorAction SilentlyContinue
     if (-not $content -or $content -notmatch '\S') {
         $targetFile = $latest.FullName
-        Write-Output "最新のtodoファイルが空のため、それを開きます: $targetFile"
+        Write-Output "Updated: $targetFile"
     } else {
         $num = [int]($latest.Name -replace '-todo\.md', '')
         $targetFile = Join-Path $todoDir ("{0:D3}-todo.md" -f ($num + 1))
         New-Item -ItemType File -Path $targetFile -Force | Out-Null
-        Write-Output "新しいtodoファイルを作成しました: $targetFile"
+        Write-Output "Created: $targetFile"
     }
 } else {
     $targetFile = Join-Path $todoDir '001-todo.md'
     New-Item -ItemType File -Path $targetFile -Force | Out-Null
-    Write-Output "新しいtodoファイルを作成しました: $targetFile"
+    Write-Output "Created: $targetFile"
 }
 
-Write-Output "vim で開きます: $targetFile"
+Write-Output "Open by Vim: $targetFile"
 & vim $targetFile

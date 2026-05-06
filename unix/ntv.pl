@@ -65,18 +65,18 @@ if (@sorted) {
     # \S: 空白以外の文字がなければ空ファイルと判定
     if (fread($latest) !~ /\S/) {
         $target_file = $latest;
-        print "最新のtodoファイルが空のため、それを開きます: $latest\n";
+        print "Updated: $latest\n";
     } else {
         my ($num) = $latest =~ /(\d{3})-todo\.md$/;
         $target_file = sprintf("%s/%03d-todo.md", $todo_dir, $num + 1);
         fwrite($target_file, "");
-        print "新しいtodoファイルを作成しました: $target_file\n";
+        print "Created: $target_file\n";
     }
 } else {
     $target_file = "$todo_dir/001-todo.md";
     fwrite($target_file, "");
-    print "新しいtodoファイルを作成しました: $target_file\n";
+    print "Created: $target_file\n";
 }
 
-print "vim で開きます: $target_file\n";
+print "Open by Vim: $target_file\n";
 exec($vim_path, $target_file);  # 現在のプロセスをvimに置き換える
