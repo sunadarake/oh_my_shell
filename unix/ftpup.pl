@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use utf8;
-use Getopt::Long;
+use Getopt::Long qw(:config posix_default no_ignore_case gnu_compat);
 use JSON::PP;
 
 binmode STDOUT, ':utf8';
@@ -16,10 +16,10 @@ my $version = '1.0.0';
 my %opt = (
     host      => '',
     port      => 21,
-    user      => 'anonymous',
+    user      => '',
     password  => '',
-    localdir  => '.',
-    serverdir => '/',
+    localdir  => '',
+    serverdir => '',
     passive   => 1,
     file      => 'ftpup.json',
 );
@@ -37,7 +37,7 @@ sub print_help {
   --host,      -h  FTPサーバーホスト名
   --port,      -p  ポート番号 (デフォルト: 21)
   --user,      -u  ユーザー名 (デフォルト: anonymous)
-  --password,  -w  パスワード
+  --password,  -P  パスワード
   --localdir,  -l  ローカルディレクトリ (デフォルト: .)
   --serverdir, -s  サーバー上のディレクトリ (デフォルト: /)
   --passive        パッシブモード 1=有効 0=無効 (デフォルト: 1)
@@ -106,18 +106,21 @@ sub main {
         'host|h=s'      => \$opt{host},
         'port|p=i'      => \$opt{port},
         'user|u=s'      => \$opt{user},
-        'password|w=s'  => \$opt{password},
+        'password|P=s'  => \$opt{password},
         'localdir|l=s'  => \$opt{localdir},
         'serverdir|s=s' => \$opt{serverdir},
         'passive=i'     => \$opt{passive},
-        'file|f=s'    => \$opt{file},
-        'version'     => \&print_version,
-        'help'        => \&print_help,
+        'file|f=s'      => \$opt{file},
+        'version'       => \&print_version,
+        'help'          => \&print_help,
     ) or print_help();
 
     load_config($opt{file});
 
-    die "エラー: --host が指定されていません\n" unless $opt{host};
+    die "エラー: --host が指定されていません\n"      unless $opt{host};
+    die "エラー: --user が指定されていません\n"      unless $opt{user};
+    die "エラー: --localdir が指定されていません\n"  unless $opt{localdir};
+    die "エラー: --serverdir が指定されていません\n" unless $opt{serverdir};
 
     check_lftp();
     run_lftp();
