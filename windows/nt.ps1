@@ -48,30 +48,26 @@ if ($baseFile) {
     # todoディレクトリモード
     $cwd = (Get-Location).Path
     $todoDir = $null
-
     if ((Split-Path $cwd -Leaf) -eq 'todo') {
         $todoDir = $cwd
     } elseif (Test-Path (Join-Path $cwd 'todo') -PathType Container) {
         $todoDir = Join-Path $cwd 'todo'
     }
-
     if (-not $todoDir) {
         Write-Error "エラー: todoディレクトリが見つかりません。`nカレントディレクトリが todo、または１つ上に todo ディレクトリが必要です。"
         exit 1
     }
-
     $existing = Get-ChildItem -Path $todoDir -Recurse -File |
         Where-Object { $_.Name -match '^\d{3}-todo\.md$' } |
         ForEach-Object { [int]($_.Name -replace '-todo\.md', '') }
-
     $next = 1
     if ($existing) {
-        $next = ($existing | Measure-Object -Maximum).Maximum + 1
+        $next = [int]($existing | Measure-Object -Maximum).Maximum + 1
     }
-
     for ($i = 0; $i -lt $count; $i++) {
         $filename = Join-Path $todoDir ("{0:D3}-todo.md" -f ($next + $i))
         New-Item -ItemType File -Path $filename -Force | Out-Null
         Write-Output "Created: $filename"
     }
 }
+
