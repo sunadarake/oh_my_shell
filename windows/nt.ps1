@@ -40,7 +40,8 @@ if ($baseFile) {
         $ext  = if ($Matches[2]) { $Matches[2] } else { '' }
     }
     for ($i = 1; $i -le $count; $i++) {
-        $filename = "{0}-{1:D3}{2}" -f $stem, $i, $ext
+        # 環境によって {0:D3} 書式がエラーになるため PadLeft でゼロ埋め
+        $filename = "{0}-{1}{2}" -f $stem, ([string]$i).PadLeft(3, '0'), $ext
         New-Item -ItemType File -Path $filename -Force | Out-Null
         Write-Output "Created: $filename"
     }
@@ -65,7 +66,8 @@ if ($baseFile) {
         $next = [int]($existing | Measure-Object -Maximum).Maximum + 1
     }
     for ($i = 0; $i -lt $count; $i++) {
-        $filename = Join-Path $todoDir ("{0:D3}-todo.md" -f ($next + $i))
+        $num = ([string]($next + $i)).PadLeft(3, '0')
+        $filename = Join-Path $todoDir "$num-todo.md"
         New-Item -ItemType File -Path $filename -Force | Out-Null
         Write-Output "Created: $filename"
     }

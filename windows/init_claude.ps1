@@ -15,10 +15,24 @@ if (-not (Test-Path $settingsFile)) {
     )
     $prefixes = @('', 'busybox ', 'busybox64u ')
 
-    $allow = foreach ($prefix in $prefixes) {
+    # Bash（busybox経由も含む）用の許可コマンド
+    $bashAllow = foreach ($prefix in $prefixes) {
         foreach ($cmd in $commands) { "Bash($prefix${cmd}:*)" }
     }
-    $allow = @($allow) + @('Bash(git add:*)', 'List(*)', 'Edit(*)', 'Write(*)', 'mcp__voicevox__speak')
+
+    # PowerShell（Windows環境）用の許可コマンド。busyboxはPowerShellからも実行できるため同じ組み合わせを許可
+    $psAllow = foreach ($prefix in $prefixes) {
+        foreach ($cmd in $commands) { "PowerShell($prefix${cmd}:*)" }
+    }
+    # 上記に対応するPowerShellネイティブのコマンドレットも許可
+    $psNativeCommands = @(
+        'Get-ChildItem','Get-Content','Select-String','Get-Item','Test-Path',
+        'Copy-Item','Move-Item','New-Item','Remove-Item',
+        'Sort-Object','Get-Location','Set-Location','Measure-Object','Compare-Object'
+    )
+    $psAllow = @($psAllow) + foreach ($cmd in $psNativeCommands) { "PowerShell(${cmd}:*)" }
+
+    $allow = @($bashAllow) + @($psAllow) + @('Bash(git add:*)', 'PowerShell(git add:*)', 'List(*)', 'Edit(*)', 'Write(*)', 'mcp__voicevox__speak')
 
     $settings = @{
         permissions = @{
