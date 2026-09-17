@@ -30,7 +30,7 @@ if (-not (Test-Path $settingsFile)) {
         'Copy-Item','Move-Item','New-Item','Remove-Item',
         'Sort-Object','Get-Location','Set-Location','Measure-Object','Compare-Object'
     )
-    $psAllow = @($psAllow) + foreach ($cmd in $psNativeCommands) { "PowerShell(${cmd}:*)" }
+    $psAllow = @($psAllow) + $(foreach ($cmd in $psNativeCommands) { "PowerShell(${cmd}:*)" })
 
     $allow = @($bashAllow) + @($psAllow) + @('Bash(git add:*)', 'PowerShell(git add:*)', 'List(*)', 'Edit(*)', 'Write(*)', 'mcp__voicevox__speak')
 
