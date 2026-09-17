@@ -84,9 +84,7 @@ $mdContent = @'
 * コメントはUTF-8の日本語で書くこと。
 * 問題に取り組む前に、コードや仕様を読んで理解すること。
 
-## Bashについて
 
-bashを使わずにbusyboxを使う様にしてください。
 '@
 
 foreach ($file in @('CLAUDE.md', 'AGENTS.md')) {
