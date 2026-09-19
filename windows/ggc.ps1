@@ -8,7 +8,7 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
 }
 
 if ($args.Count -eq 0) {
-    $msg = "update"
+    $msg = "update " + (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
 } else {
     $msg = $args -join "`n"
 }

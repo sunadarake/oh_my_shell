@@ -8,7 +8,7 @@ if ! command -v git >/dev/null 2>&1; then
 fi
 
 if [ $# -eq 0 ]; then
-    msg="update"
+    msg="update $(date '+%Y-%m-%d %H:%M:%S')"
 else
     # 複数引数を改行区切りで結合してコミットメッセージにする
     msg=$(printf "%s\n" "$@")
