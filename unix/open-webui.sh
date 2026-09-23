@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # 元ファイル: shell/open-webui.sh - Open WebUIを起動する
 
 if ! command -v uv >/dev/null 2>&1; then

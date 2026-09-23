@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # 元ファイル: shell/ggc.sh - git add . && git commit をするコマンド
 #   ggc "readmeの修正" "jsの改善" のように引数でコミットメッセージを追加できる
 

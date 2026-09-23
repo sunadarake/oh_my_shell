@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # 元ファイル: shell/tt.sh - ディレクトリごとファイルを作成するコマンド
 #   tt .claude/settings.json bin/oreore/
 #   .claude/settings.json のファイルと bin/oreore/ ディレクトリが作成される

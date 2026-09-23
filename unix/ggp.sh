@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # 元ファイル: shell/ggp.sh - git push origin main をするコマンド
 
 if ! command -v git >/dev/null 2>&1; then

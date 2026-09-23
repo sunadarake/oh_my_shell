@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # 元ファイル: shell/tre.sh - OS判別してtree/gtreeを実行する（ビルドディレクトリを自動除外）
 #   -I <pattern> で除外パターンを追加できる（複数指定可）
 

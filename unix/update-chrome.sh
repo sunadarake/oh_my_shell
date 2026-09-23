@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # 元ファイル: shell/update-chrome.sh - Google Chrome をアップデートする
 
 os=$(uname -s)

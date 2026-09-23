@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # 元ファイル: shell/memo.sh - memomemoをVSCodeで開く
 
 rootdir="$HOME/Documents/memomemo"

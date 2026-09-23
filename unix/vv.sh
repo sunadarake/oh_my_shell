@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # 元ファイル: shell/vv.sh - ファイルを別ターミナルでvimで開く
 #   vv <file>
 

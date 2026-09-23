@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # 元ファイル: shell/ccc.sh - クリップボードにコピーする
 #   cat sample.md | ccc
 #   ccc sample.md
