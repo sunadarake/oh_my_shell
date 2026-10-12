@@ -2,27 +2,22 @@
 
 ## プロジェクト概要
 
-便利スクリプト集。既存の `shell/` および `perl/` にあるスクリプトを、以下の2つのターゲット向けに移植する。
+便利スクリプト集。。
 
-- `unix/` : Linux/Mac向け、bash で記述
-- `windows/` : Windows向け、PowerShell で記述
+- `unix/` : Linux/Mac向け、bash  or Perlで記述
+- `windows/` : Windows向け、PowerShell7 で記述
 
 ## ディレクトリ構成
 
 ```
 .
-├── shell/       # 移植元: シェルスクリプト
-├── perl/        # 移植元: Perlスクリプト
-├── unix/        # 移植先: bash スクリプト
-└── windows/     # 移植先: PowerShell スクリプト
+├── unix/        # bash スクリプト or perlスクリプト
+└── windows/     # PowerShell スクリプト
 ```
-
-## 移植ルール
 
 ### 共通
 
 - 各スクリプトは独立している（相互依存なし）
-- 移植前に必ずファイルを読み込み、動作を完全に理解してから書き直すこと
 - 機能・動作は元スクリプトと同等にすること
 - スクリプト冒頭にコメントで元ファイル名と用途を記載すること
 
