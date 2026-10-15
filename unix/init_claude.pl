@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# 元ファイル: perl/init_claude.pl - Claude設定ファイルを初期化
+# 元ファイル: perl/init_claude.pl - Claude Code / OpenCode設定ファイルを初期化
 # 使い方: perl init_claude.pl
 
 use strict;
@@ -16,20 +16,21 @@ sub fwrite {
     close($fh);
 }
 
+my @commands = qw(
+    rg grep egrep fgrep
+    mkdir cp mv touch chmod chown find
+    cat head tail less more wc sort uniq cut awk sed tee
+    ls stat file diff du df
+    which whereis pwd
+);
+# コマンド × プレフィックス(busybox等)の全組み合わせで許可リストを生成
+my @prefixes = ('', 'busybox ', 'busybox64u ');
+
 my $settings_file = '.claude/settings.json';
 # settings.json が未作成のときのみ初期化する
 unless (-f $settings_file) {
     make_path('.claude');
 
-    my @commands = qw(
-        rg grep egrep fgrep
-        mkdir cp mv touch chmod chown find
-        cat head tail less more wc sort uniq cut awk sed tee
-        ls stat file diff du df
-        which whereis pwd
-    );
-    # コマンド × プレフィックス(busybox等)の全組み合わせで許可リストを生成
-    my @prefixes = ('', 'busybox ', 'busybox64u ');
     my @allow = map { my $p = $_; map { "Bash(${p}$_:*)" } @commands } @prefixes;
     push @allow, "Bash(git add:*)", "List(*)", "Edit(*)", "Write(*)", "mcp__voicevox__speak";
 
@@ -83,6 +84,37 @@ for my $name (sort keys %commands) {
         fwrite($file, $commands{$name});
         print "Created: $file\n";
     }
+}
+
+# OpenCode: .opencode/commands に同じコマンドを追加する(argument-hint は未対応のため除く)
+make_path('.opencode/commands');
+for my $name (sort keys %commands) {
+    my $file = ".opencode/commands/$name";
+    unless (-f $file) {
+        (my $body = $commands{$name}) =~ s/^argument-hint:.*\n//m;
+        fwrite($file, $body);
+        print "Created: $file\n";
+    }
+}
+
+# OpenCode: opencode.json に permission を設定する(後勝ちのため "*" を先頭に置く)
+my $opencode_file = 'opencode.json';
+unless (-f $opencode_file) {
+    my %bash = ('*' => 'ask');
+    for my $p (@prefixes) {
+        for my $c (@commands) {
+            # 引数なし・引数ありの両方を許可する
+            $bash{"$p$c"} = $bash{"$p$c *"} = 'allow';
+        }
+    }
+    $bash{'git add *'} = 'allow';
+    # TODO: mcp__voicevox__speak 相当の許可は OpenCode のMCP設定に依存するため未対応
+    my $config = {
+        '$schema'  => 'https://opencode.ai/config.json',
+        permission => { bash => \%bash, edit => 'allow' },
+    };
+    fwrite($opencode_file, JSON::PP->new->utf8->pretty->canonical->encode($config));
+    print "Created: $opencode_file\n";
 }
 
 # CLAUDE.md / AGENTS.md のテンプレート

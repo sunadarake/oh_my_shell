@@ -1,19 +1,19 @@
-# init_claude - Claude設定ファイルを初期化
+# init_claude - Claude Code / OpenCode設定ファイルを初期化
 # 元ファイル: perl/init_claude.pl
 # 使い方: .\init_claude.ps1
+
+$commands = @(
+    'rg','grep','egrep','fgrep',
+    'mkdir','cp','mv','touch','chmod','chown','find',
+    'cat','head','tail','less','more','wc','sort','uniq','cut','awk','sed','tee',
+    'ls','stat','file','diff','du','df',
+    'which','whereis','pwd'
+)
+$prefixes = @('', 'busybox ', 'busybox64u ')
 
 $settingsFile = '.claude\settings.json'
 if (-not (Test-Path $settingsFile)) {
     New-Item -ItemType Directory -Path '.claude' -Force | Out-Null
-
-    $commands = @(
-        'rg','grep','egrep','fgrep',
-        'mkdir','cp','mv','touch','chmod','chown','find',
-        'cat','head','tail','less','more','wc','sort','uniq','cut','awk','sed','tee',
-        'ls','stat','file','diff','du','df',
-        'which','whereis','pwd'
-    )
-    $prefixes = @('', 'busybox ', 'busybox64u ')
 
     # Bash（busybox経由も含む）用の許可コマンド
     $bashAllow = foreach ($prefix in $prefixes) {
@@ -48,7 +48,7 @@ if (-not (Test-Path $settingsFile)) {
 $commandsDir = '.claude\commands'
 New-Item -ItemType Directory -Path $commandsDir -Force | Out-Null
 
-$commands = @{
+$slashCommands = @{
     'ask.md' = @'
 ---
 description: Claudeに質問する(日本語で簡潔に回答)
@@ -85,12 +85,45 @@ description: ここまでの変更をgit commitする
 - 変更内容が一目で分かる1行目(50文字程度)にしてください。必要な場合のみ、空行のあとに補足を書いてください。
 '@
 }
-foreach ($name in $commands.Keys) {
+foreach ($name in $slashCommands.Keys) {
     $file = Join-Path $commandsDir $name
     if (-not (Test-Path $file)) {
-        Set-Content $file $commands[$name] -Encoding UTF8NoBOM
+        Set-Content $file $slashCommands[$name] -Encoding UTF8NoBOM
         Write-Output "Created: $file"
     }
+}
+
+# OpenCode: .opencode\commands に同じコマンドを追加する(argument-hint は未対応のため除く)
+$ocCommandsDir = '.opencode\commands'
+New-Item -ItemType Directory -Path $ocCommandsDir -Force | Out-Null
+foreach ($name in $slashCommands.Keys) {
+    $file = Join-Path $ocCommandsDir $name
+    if (-not (Test-Path $file)) {
+        $body = $slashCommands[$name] -replace '(?m)^argument-hint:.*\r?\n', ''
+        Set-Content $file $body -Encoding UTF8NoBOM
+        Write-Output "Created: $file"
+    }
+}
+
+# OpenCode: opencode.json に permission を設定する(後勝ちのため "*" を先頭に置く)
+$opencodeFile = 'opencode.json'
+if (-not (Test-Path $opencodeFile)) {
+    $bash = [ordered]@{ '*' = 'ask' }
+    foreach ($prefix in $prefixes) {
+        foreach ($cmd in $commands) {
+            # 引数なし・引数ありの両方を許可する
+            $bash["$prefix$cmd"] = 'allow'
+            $bash["$prefix$cmd *"] = 'allow'
+        }
+    }
+    $bash['git add *'] = 'allow'
+    # TODO: mcp__voicevox__speak 相当の許可は OpenCode のMCP設定に依存するため未対応
+    $config = [ordered]@{
+        '$schema'  = 'https://opencode.ai/config.json'
+        permission = [ordered]@{ bash = $bash; edit = 'allow' }
+    }
+    $config | ConvertTo-Json -Depth 5 | Set-Content $opencodeFile -Encoding UTF8NoBOM
+    Write-Output "Created: $opencodeFile"
 }
 
 $mdContent = @'
