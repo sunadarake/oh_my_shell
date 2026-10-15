@@ -22,7 +22,7 @@ my @commands = qw(
     cat head tail less more wc sort uniq cut awk sed tee
     ls stat file diff du df
     which whereis pwd
-    echo curl
+    echo curl base64
 );
 # コマンド × プレフィックス(busybox等)の全組み合わせで許可リストを生成
 my @prefixes = ('', 'busybox ', 'busybox64u ');
@@ -33,7 +33,7 @@ unless (-f $settings_file) {
     make_path('.claude');
 
     my @allow = map { my $p = $_; map { "Bash(${p}$_:*)" } @commands } @prefixes;
-    push @allow, "Bash(git add:*)", "List(*)", "Edit(*)", "Write(*)", "mcp__voicevox__speak";
+    push @allow, "Bash(git:*)", "List(*)", "Edit(*)", "Write(*)", "mcp__voicevox__speak";
 
     my $settings = { permissions => { allow => \@allow, deny => [] } };
     fwrite($settings_file, JSON::PP->new->utf8->pretty->encode($settings));
@@ -110,7 +110,7 @@ unless (-f $opencode_file) {
             $bash{"$p$c"} = $bash{"$p$c *"} = 'allow';
         }
     }
-    $bash{'git add *'} = 'allow';
+    $bash{'git *'} = 'allow';
     # TODO: mcp__voicevox__speak 相当の許可は OpenCode のMCP設定に依存するため未対応
     my $config = {
         '$schema'  => 'https://opencode.ai/config.json',

@@ -8,7 +8,7 @@ $commands = @(
     'cat','head','tail','less','more','wc','sort','uniq','cut','awk','sed','tee',
     'ls','stat','file','diff','du','df',
     'which','whereis','pwd',
-    'echo','curl'
+    'echo','curl','base64'
 )
 $prefixes = @('', 'busybox ', 'busybox64u ')
 
@@ -33,7 +33,7 @@ if (-not (Test-Path $settingsFile)) {
     )
     $psAllow = @($psAllow) + $(foreach ($cmd in $psNativeCommands) { "PowerShell(${cmd}:*)" })
 
-    $allow = @($bashAllow) + @($psAllow) + @('Bash(git add:*)', 'PowerShell(git add:*)', 'List(*)', 'Edit(*)', 'Write(*)', 'mcp__voicevox__speak')
+    $allow = @($bashAllow) + @($psAllow) + @('Bash(git:*)', 'PowerShell(git:*)', 'List(*)', 'Edit(*)', 'Write(*)', 'mcp__voicevox__speak')
 
     $settings = @{
         permissions = @{
@@ -117,7 +117,7 @@ if (-not (Test-Path $opencodeFile)) {
             $bash["$prefix$cmd *"] = 'allow'
         }
     }
-    $bash['git add *'] = 'allow'
+    $bash['git *'] = 'allow'
     # TODO: mcp__voicevox__speak 相当の許可は OpenCode のMCP設定に依存するため未対応
     $config = [ordered]@{
         '$schema'  = 'https://opencode.ai/config.json'
