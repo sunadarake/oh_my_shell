@@ -103,18 +103,15 @@ for my $name (sort keys %commands) {
 # OpenCode: opencode.json に permission を設定する(後勝ちのため "*" を先頭に置く)
 my $opencode_file = 'opencode.json';
 unless (-f $opencode_file) {
-    my %bash = ('*' => 'ask');
-    for my $p (@prefixes) {
-        for my $c (@commands) {
-            # 引数なし・引数ありの両方を許可する
-            $bash{"$p$c"} = $bash{"$p$c *"} = 'allow';
-        }
-    }
-    $bash{'git *'} = 'allow';
-    # TODO: mcp__voicevox__speak 相当の許可は OpenCode のMCP設定に依存するため未対応
     my $config = {
         '$schema'  => 'https://opencode.ai/config.json',
-        permission => { bash => \%bash, edit => 'allow' },
+        permission => {
+            '*'                => 'allow',
+            edit               => 'allow',
+            webfetch           => 'allow',
+            external_directory => 'ask',
+            bash               => { '*' => 'allow', 'rm *' => 'ask', 'rmdir *' => 'ask' },
+        },
     };
     fwrite($opencode_file, JSON::PP->new->utf8->pretty->canonical->encode($config));
     print "Created: $opencode_file\n";

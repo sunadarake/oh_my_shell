@@ -109,19 +109,15 @@ foreach ($name in $slashCommands.Keys) {
 # OpenCode: opencode.json に permission を設定する(後勝ちのため "*" を先頭に置く)
 $opencodeFile = 'opencode.json'
 if (-not (Test-Path $opencodeFile)) {
-    $bash = [ordered]@{ '*' = 'ask' }
-    foreach ($prefix in $prefixes) {
-        foreach ($cmd in $commands) {
-            # 引数なし・引数ありの両方を許可する
-            $bash["$prefix$cmd"] = 'allow'
-            $bash["$prefix$cmd *"] = 'allow'
-        }
-    }
-    $bash['git *'] = 'allow'
-    # TODO: mcp__voicevox__speak 相当の許可は OpenCode のMCP設定に依存するため未対応
     $config = [ordered]@{
         '$schema'  = 'https://opencode.ai/config.json'
-        permission = [ordered]@{ bash = $bash; edit = 'allow' }
+        permission = [ordered]@{
+            '*'                = 'allow'
+            edit               = 'allow'
+            webfetch           = 'allow'
+            external_directory = 'ask'
+            bash               = [ordered]@{ '*' = 'allow'; 'rm *' = 'ask'; 'rmdir *' = 'ask' }
+        }
     }
     $config | ConvertTo-Json -Depth 5 | Set-Content $opencodeFile -Encoding UTF8NoBOM
     Write-Output "Created: $opencodeFile"
