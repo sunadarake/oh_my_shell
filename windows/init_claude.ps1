@@ -94,12 +94,13 @@ foreach ($name in $slashCommands.Keys) {
 }
 
 # OpenCode: .opencode\commands に同じコマンドを追加する(argument-hint は未対応のため除く)
+# update-claude-md は update-agents-md に改名し、AGENTS.md を更新対象にする
 $ocCommandsDir = '.opencode\commands'
 New-Item -ItemType Directory -Path $ocCommandsDir -Force | Out-Null
 foreach ($name in $slashCommands.Keys) {
-    $file = Join-Path $ocCommandsDir $name
+    $file = Join-Path $ocCommandsDir ($name -replace 'claude-md', 'agents-md')
     if (-not (Test-Path $file)) {
-        $body = $slashCommands[$name] -replace '(?m)^argument-hint:.*\r?\n', ''
+        $body = $slashCommands[$name] -replace '(?m)^argument-hint:.*\r?\n', '' -replace 'CLAUDE\.md', 'AGENTS.md'
         Set-Content $file $body -Encoding UTF8NoBOM
         Write-Output "Created: $file"
     }

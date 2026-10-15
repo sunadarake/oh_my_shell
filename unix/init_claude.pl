@@ -87,11 +87,14 @@ for my $name (sort keys %commands) {
 }
 
 # OpenCode: .opencode/commands に同じコマンドを追加する(argument-hint は未対応のため除く)
+# update-claude-md は update-agents-md に改名し、AGENTS.md を更新対象にする
 make_path('.opencode/commands');
 for my $name (sort keys %commands) {
-    my $file = ".opencode/commands/$name";
+    (my $ocname = $name) =~ s/claude-md/agents-md/;
+    my $file = ".opencode/commands/$ocname";
     unless (-f $file) {
         (my $body = $commands{$name}) =~ s/^argument-hint:.*\n//m;
+        $body =~ s/CLAUDE\.md/AGENTS.md/g;
         fwrite($file, $body);
         print "Created: $file\n";
     }
