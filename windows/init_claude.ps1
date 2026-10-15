@@ -7,7 +7,8 @@ $commands = @(
     'mkdir','cp','mv','touch','chmod','chown','find',
     'cat','head','tail','less','more','wc','sort','uniq','cut','awk','sed','tee',
     'ls','stat','file','diff','du','df',
-    'which','whereis','pwd'
+    'which','whereis','pwd',
+    'echo','curl'
 )
 $prefixes = @('', 'busybox ', 'busybox64u ')
 

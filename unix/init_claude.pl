@@ -22,6 +22,7 @@ my @commands = qw(
     cat head tail less more wc sort uniq cut awk sed tee
     ls stat file diff du df
     which whereis pwd
+    echo curl
 );
 # コマンド × プレフィックス(busybox等)の全組み合わせで許可リストを生成
 my @prefixes = ('', 'busybox ', 'busybox64u ');
