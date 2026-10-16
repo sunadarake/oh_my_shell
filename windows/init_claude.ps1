@@ -149,11 +149,9 @@ $mdContent = @'
 
 '@
 
-foreach ($file in @('CLAUDE.md', 'AGENTS.md')) {
-    if (-not (Test-Path $file)) {
-        Set-Content $file $mdContent -Encoding UTF8NoBOM
-        Write-Output "Created: $file"
-    }
+if (-not (Test-Path 'AGENTS.md')) {
+    Set-Content 'AGENTS.md' $mdContent -Encoding UTF8NoBOM
+    Write-Output "Created: AGENTS.md"
 }
 
 Write-Output "Finish Complete"

@@ -129,7 +129,7 @@ unless (-f $opencode_file) {
     print "Created: $opencode_file\n";
 }
 
-# CLAUDE.md / AGENTS.md のテンプレート
+# AGENTS.md のテンプレート
 my $content = <<'MD';
 <<ここにプロジェクトの名前を入れる>>
 
@@ -146,12 +146,10 @@ my $content = <<'MD';
 bashを使わずにbusyboxを使う様にしてください。
 MD
 
-# 両ファイルとも未作成のときのみ生成する
-for my $md ('CLAUDE.md', 'AGENTS.md') {
-    unless (-f $md) {
-        fwrite($md, $content);
-        print "Created: $md\n";
-    }
+# 未作成のときのみ生成する
+unless (-f 'AGENTS.md') {
+    fwrite('AGENTS.md', $content);
+    print "Created: AGENTS.md\n";
 }
 
 print "Finish Complete\n";

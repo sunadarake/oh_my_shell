@@ -78,7 +78,7 @@ ggp origin feature-branch
 
 ### init_claude Claudeの雛形を作成する
 
-現在のディレクトリに CLAUDE.mdや .claude/settings.jsonを作成する
+現在のディレクトリに AGENTS.mdや .claude/settings.jsonを作成する
 
 ```bash
 init_claude
@@ -86,7 +86,7 @@ init_claude
 
 ### init_python_scripts Pythonのスクリプト集プロジェクトの雛形を作成する
 
-`uv init --package foo-bar` をしたあとに、CLAUDE.mdなどを追加したプロジェクトを作成する。
+`uv init --package foo-bar` をしたあとに、AGENTS.mdなどを追加したプロジェクトを作成する。
 
 ```bash
 init_python_scripts
