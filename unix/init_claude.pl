@@ -35,7 +35,12 @@ unless (-f $settings_file) {
     my @allow = map { my $p = $_; map { "Bash(${p}$_:*)" } @commands } @prefixes;
     push @allow, "Bash(git:*)", "List(*)", "Edit(*)", "Write(*)", "mcp__voicevox__speak";
 
-    my $settings = { permissions => { allow => \@allow, deny => [] } };
+    # 署名(Co-Authored-By等)をコミット・PRに付けない
+    my $settings = {
+        permissions => { allow => \@allow, deny => [] },
+        attribution => { commit => '', pr => '' },
+        includeCoAuthoredBy => JSON::PP::false,
+    };
     fwrite($settings_file, JSON::PP->new->utf8->pretty->encode($settings));
     print "Created: $settings_file\n";
 }
@@ -87,6 +92,7 @@ description: ここまでの変更をgit commitする
 
 - コミットメッセージは、日本語で簡潔かつ分かりやすく書いてください。
 - 変更内容が一目で分かる1行目(50文字程度)にしてください。必要な場合のみ、空行のあとに補足を書いてください。
+- `Co-Authored-By: Claude ...` や `🤖 Generated with Claude Code` などの署名・クレジット行は、コミットメッセージに含めないでください。
 MD
 );
 make_path('.claude/commands');

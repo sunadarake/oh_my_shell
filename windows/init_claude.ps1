@@ -40,6 +40,9 @@ if (-not (Test-Path $settingsFile)) {
             allow = $allow
             deny  = @()
         }
+        # 署名(Co-Authored-By等)をコミット・PRに付けない
+        attribution = @{ commit = ''; pr = '' }
+        includeCoAuthoredBy = $false
     }
     $settings | ConvertTo-Json -Depth 5 | Set-Content $settingsFile -Encoding UTF8NoBOM
     Write-Output "Created: $settingsFile"
@@ -95,6 +98,7 @@ description: ここまでの変更をgit commitする
 
 - コミットメッセージは、日本語で簡潔かつ分かりやすく書いてください。
 - 変更内容が一目で分かる1行目(50文字程度)にしてください。必要な場合のみ、空行のあとに補足を書いてください。
+- `Co-Authored-By: Claude ...` や `🤖 Generated with Claude Code` などの署名・クレジット行は、コミットメッセージに含めないでください。
 '@
 }
 foreach ($name in $slashCommands.Keys) {
