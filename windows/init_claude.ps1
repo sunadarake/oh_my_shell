@@ -65,18 +65,6 @@ argument-hint: [質問内容]
 
 質問: $ARGUMENTS
 '@
-    'update-claude-md.md' = @'
----
-description: これまでの変更を踏まえてCLAUDE.mdを更新する
----
-
-このセッションでの変更を踏まえて、`CLAUDE.md` を実態に合わせて更新してください。
-
-- 変更された仕様・コマンド・ディレクトリ構成を反映する
-- 古くなった記述は削除または修正する
-- 既存の構成やトーンは維持し、差分は最小限にする
-
-'@
     'update-agents-md.md' = @'
 ---
 description: これまでの変更を踏まえてAGENTS.mdを更新する
@@ -110,11 +98,10 @@ foreach ($name in $slashCommands.Keys) {
 }
 
 # OpenCode: .opencode\commands に同じコマンドを追加する(argument-hint は未対応のため除く)
-# update-claude-md は update-agents-md に改名し、AGENTS.md を更新対象にする
 $ocCommandsDir = '.opencode\commands'
 New-Item -ItemType Directory -Path $ocCommandsDir -Force | Out-Null
 foreach ($name in $slashCommands.Keys) {
-    $file = Join-Path $ocCommandsDir ($name -replace 'claude-md', 'agents-md')
+    $file = Join-Path $ocCommandsDir $name
     if (-not (Test-Path $file)) {
         $body = $slashCommands[$name] -replace '(?m)^argument-hint:.*\r?\n', '' -replace 'CLAUDE\.md', 'AGENTS.md'
         Set-Content $file $body -Encoding UTF8NoBOM

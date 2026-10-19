@@ -1,4 +1,9 @@
 {
+   "includeCoAuthoredBy" : false,
+   "attribution" : {
+      "pr" : "",
+      "commit" : ""
+   },
    "permissions" : {
       "allow" : [
          "Bash(rg:*)",
@@ -33,6 +38,9 @@
          "Bash(which:*)",
          "Bash(whereis:*)",
          "Bash(pwd:*)",
+         "Bash(echo:*)",
+         "Bash(curl:*)",
+         "Bash(base64:*)",
          "Bash(busybox rg:*)",
          "Bash(busybox grep:*)",
          "Bash(busybox egrep:*)",
@@ -65,6 +73,9 @@
          "Bash(busybox which:*)",
          "Bash(busybox whereis:*)",
          "Bash(busybox pwd:*)",
+         "Bash(busybox echo:*)",
+         "Bash(busybox curl:*)",
+         "Bash(busybox base64:*)",
          "Bash(busybox64u rg:*)",
          "Bash(busybox64u grep:*)",
          "Bash(busybox64u egrep:*)",
@@ -97,7 +108,10 @@
          "Bash(busybox64u which:*)",
          "Bash(busybox64u whereis:*)",
          "Bash(busybox64u pwd:*)",
-         "Bash(git add:*)",
+         "Bash(busybox64u echo:*)",
+         "Bash(busybox64u curl:*)",
+         "Bash(busybox64u base64:*)",
+         "Bash(git:*)",
          "List(*)",
          "Edit(*)",
          "Write(*)",
