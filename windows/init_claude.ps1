@@ -10,21 +10,16 @@ $commands = @(
     'which','whereis','pwd',
     'echo','curl','base64'
 )
-$prefixes = @('', 'busybox ', 'busybox64u ')
 
 $settingsFile = '.claude\settings.json'
 if (-not (Test-Path $settingsFile)) {
     New-Item -ItemType Directory -Path '.claude' -Force | Out-Null
 
-    # Bash（busybox経由も含む）用の許可コマンド
-    $bashAllow = foreach ($prefix in $prefixes) {
-        foreach ($cmd in $commands) { "Bash($prefix${cmd}:*)" }
-    }
+    # Bash用の許可コマンド
+    $bashAllow = foreach ($cmd in $commands) { "Bash(${cmd}:*)" }
 
-    # PowerShell（Windows環境）用の許可コマンド。busyboxはPowerShellからも実行できるため同じ組み合わせを許可
-    $psAllow = foreach ($prefix in $prefixes) {
-        foreach ($cmd in $commands) { "PowerShell($prefix${cmd}:*)" }
-    }
+    # PowerShell（Windows環境）用の許可コマンド
+    $psAllow = foreach ($cmd in $commands) { "PowerShell(${cmd}:*)" }
     # 上記に対応するPowerShellネイティブのコマンドレットも許可
     $psNativeCommands = @(
         'Get-ChildItem','Get-Content','Select-String','Get-Item','Test-Path',
@@ -38,7 +33,11 @@ if (-not (Test-Path $settingsFile)) {
     $settings = @{
         permissions = @{
             allow = $allow
-            deny  = @()
+            # 危険な操作と機密ファイルの読み取りを拒否する
+            deny  = @(
+                'Bash(rm -rf:*)', 'Bash(git push --force:*)',
+                'Read(~/.ssh/**)', 'Read(./.env)'
+            )
         }
         # 署名(Co-Authored-By等)をコミット・PRに付けない
         attribution = @{ commit = ''; pr = '' }

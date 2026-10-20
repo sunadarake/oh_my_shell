@@ -24,20 +24,24 @@ my @commands = qw(
     which whereis pwd
     echo curl base64
 );
-# コマンド × プレフィックス(busybox等)の全組み合わせで許可リストを生成
-my @prefixes = ('', 'busybox ', 'busybox64u ');
 
 my $settings_file = '.claude/settings.json';
 # settings.json が未作成のときのみ初期化する
 unless (-f $settings_file) {
     make_path('.claude');
 
-    my @allow = map { my $p = $_; map { "Bash(${p}$_:*)" } @commands } @prefixes;
+    my @allow = map { "Bash($_:*)" } @commands;
     push @allow, "Bash(git:*)", "List(*)", "Edit(*)", "Write(*)", "mcp__voicevox__speak";
+
+    # 危険な操作と機密ファイルの読み取りを拒否する
+    my @deny = (
+        "Bash(rm -rf:*)", "Bash(git push --force:*)",
+        "Read(~/.ssh/**)", "Read(./.env)",
+    );
 
     # 署名(Co-Authored-By等)をコミット・PRに付けない
     my $settings = {
-        permissions => { allow => \@allow, deny => [] },
+        permissions => { allow => \@allow, deny => \@deny },
         attribution => { commit => '', pr => '' },
         includeCoAuthoredBy => JSON::PP::false,
     };
@@ -132,10 +136,6 @@ my $content = <<'MD';
 * なるべくコードやコメントをシンプルに簡潔にすること。
 * コメントはUTF-8の日本語で書くこと。
 * 問題に取り組む前に、コードや仕様を読んで理解すること。
-
-## Bashについて
-
-bashを使わずにbusyboxを使う様にしてください。
 MD
 
 # 未作成のときのみ生成する
