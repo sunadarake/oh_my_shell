@@ -14,3 +14,11 @@ for f in "$unix_dir"/*.sh "$unix_dir"/*.pl; do
 done
 
 echo "完了: ${bdir}"
+
+cat <<MSG
+
+~/.bashrc に以下を追加してください(未追加の場合):
+  export PATH="${bdir}:\$PATH"
+  source "${unix_dir}/shell/functions.sh"
+反映するには: source ~/.bashrc
+MSG

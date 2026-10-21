@@ -17,6 +17,15 @@ PATHに追加：
 export PATH="$HOME/Documents/oh_my_shell/.bin:$PATH"
 ```
 
+`mkcd` / `cd N` はシェル関数のため、`~/.bashrc` に source を追加：
+
+```bash
+source "$HOME/Documents/oh_my_shell/unix/shell/functions.sh"
+```
+
+- `mkcd <dir>` : ディレクトリを作成して移動
+- `cd 2` : `cd ../..` と同じ（同名ディレクトリがあればそちらを優先）
+
 ### Windows
 
 ```powershell

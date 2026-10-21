@@ -12,6 +12,7 @@
 ```
 .
 ├── unix/        # bash スクリプト or perlスクリプト
+│   └── shell/   # ~/.bashrc から source するシェル関数 (build_unix.sh の対象外)
 └── windows/     # PowerShell スクリプト
 ```
 
@@ -26,6 +27,7 @@
 - shebang は `#!/bin/bash` を使用
 - 文字列処理は `sed` / `awk` / `cut` などの標準ツールを使う
 - Perlスクリプトの移植も同様に bash で実装する
+- `cd` のように親シェルへ作用する関数は `unix/shell/functions.sh` に定義し、`~/.bashrc` で source する(bash のみ対応)
 
 ### windows/ (PowerShell)
 
