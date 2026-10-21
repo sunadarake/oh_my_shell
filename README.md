@@ -38,6 +38,12 @@ PATHに追加（PowerShellプロファイルに追加）：
 $env:PATH = "C:\path\to\oh_my_shell\.bin_win;$env:PATH"
 ```
 
+`mkcd` / `cd N` はシェル関数のため、PowerShellプロファイルに dot-source を追加：
+
+```powershell
+. "C:\path\to\oh_my_shell\windows\shell\functions.ps1"
+```
+
 **注意**: Windows版は `busybox64u` が必要です。
 
 ## コマンド一覧

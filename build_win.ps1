@@ -15,3 +15,9 @@ foreach ($f in Get-ChildItem -Path $winDir -Filter "*.ps1") {
 }
 
 Write-Host "完了: $binDir"
+
+Write-Host ""
+Write-Host "PowerShellプロファイル($PROFILE)に以下を追加してください(未追加の場合):"
+Write-Host "  `$env:PATH = `"$binDir;`$env:PATH`""
+Write-Host "  . `"$winDir\shell\functions.ps1`""
+Write-Host "反映するには: . `$PROFILE"

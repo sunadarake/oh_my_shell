@@ -14,6 +14,7 @@
 ├── unix/        # bash スクリプト or perlスクリプト
 │   └── shell/   # ~/.bashrc から source するシェル関数 (build_unix.sh の対象外)
 └── windows/     # PowerShell スクリプト
+    └── shell/   # $PROFILE から dot-source する関数 (build_win.ps1 の対象外)
 ```
 
 ### 共通
@@ -35,6 +36,7 @@
 - PowerShell 5.1 および 7.x 両対応を意識する
 - Unix系コマンド（`grep`, `awk` 等）は使わず、PowerShell ネイティブのコマンドレットで実装する
 - 文字コードは UTF-8 (BOM なし) を基本とする
+- `cd` のように親シェルへ作用する関数は `windows/shell/functions.ps1` に定義し、`$PROFILE` で dot-source する
 
 ## 作業上の注意
 
