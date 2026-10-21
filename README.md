@@ -25,6 +25,7 @@ source "$HOME/Documents/oh_my_shell/unix/shell/functions.sh"
 
 - `mkcd <dir>` : ディレクトリを作成して移動
 - `cd 2` : `cd ../..` と同じ（同名ディレクトリがあればそちらを優先）
+- `cdd` / `cdp` / `cdv` / `cdl` : Documents / Pictures / Videos / Downloads へ移動
 
 ### Windows
 

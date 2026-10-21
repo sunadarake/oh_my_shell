@@ -22,3 +22,9 @@ function cd {
         Set-Location @args
     }
 }
+
+# よく使うディレクトリへ移動
+function cdd { Set-Location ~\Documents }
+function cdp { Set-Location ~\Pictures }
+function cdv { Set-Location ~\Videos }
+function cdl { Set-Location ~\Downloads }

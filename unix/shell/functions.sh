@@ -21,3 +21,9 @@ cd() {
         builtin cd "$@"
     fi
 }
+
+# よく使うディレクトリへ移動
+cdd() { cd ~/Documents; }
+cdp() { cd ~/Pictures; }
+cdv() { cd ~/Videos; }
+cdl() { cd ~/Downloads; }
