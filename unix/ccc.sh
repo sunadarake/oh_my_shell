@@ -15,9 +15,6 @@ case "$(uname -s)" in
     Darwin*)
         cmd="pbcopy"
         ;;
-    CYGWIN*|MINGW*|MSYS*)
-        cmd="clip.exe"
-        ;;
     *)
         echo "Error: Unsupported OS" >&2
         exit 1

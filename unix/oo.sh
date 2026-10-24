@@ -16,9 +16,6 @@ case "$(uname -s)" in
     Darwin*)
         open "$d"
         ;;
-    MINGW*|Windows*)
-        explorer.exe "$d"
-        ;;
     *)
         echo "unknown OS" >&2
         exit 1
