@@ -1,5 +1,5 @@
 ---
-name: readme
+name: readme-update
 description: プロジェクトの README.md を日本語で新規作成・編集する。README を書いて／直して／更新して、と頼まれたときに使う。
 argument-hint: "[追加の指示]"
 ---
