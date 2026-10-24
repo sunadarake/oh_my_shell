@@ -1,5 +1,6 @@
 #!/bin/sh
 # unix/ にある .sh / .pl スクリプトを .bin/ へ拡張子なしでコピーし実行可能にする。
+# templates/ も .bin/templates へコピーする。
 # 使い方: ./build_unix.sh
 script_dir=$(cd "$(dirname "$0")" && pwd)
 unix_dir="${script_dir}/unix"
@@ -12,6 +13,10 @@ for f in "$unix_dir"/*.sh "$unix_dir"/*.pl; do
   name=$(basename "$f" | sed 's/\.[^.]*$//')
   cp "$f" "${bdir}/${name}" && chmod +x "${bdir}/${name}"
 done
+
+# スクリプトが読み込むテンプレートも .bin/ にコピーする
+rm -rf "${bdir}/templates"
+cp -R "${script_dir}/templates" "${bdir}/templates"
 
 echo "完了: ${bdir}"
 

@@ -8,6 +8,18 @@ use utf8;
 use open ':std', ':encoding(UTF-8)';
 use File::Path qw(make_path);
 use JSON::PP;
+use FindBin qw($Bin);
+use File::Basename qw(basename);
+use File::Glob qw(bsd_glob);
+
+sub fread {
+    my ($file) = @_;
+    open(my $fh, '<:encoding(UTF-8)', $file) or die "読み込みエラー: $file: $!\n";
+    local $/;
+    my $content = <$fh>;
+    close($fh);
+    return $content;
+}
 
 sub fwrite {
     my ($file, $content) = @_;
@@ -50,103 +62,10 @@ unless (-f $settings_file) {
 }
 
 # .claude/commands にスラッシュコマンドを追加する
-my %commands = (
-    'ask.md' => <<'MD',
----
-description: Claudeに質問する(日本語で簡潔に回答)
-argument-hint: [質問内容]
----
-
-次の質問に、日本語でわかりやすく簡潔に答えてください。
-専門用語は必要最小限にし、必要なら短い例を添えてください。
-コードの変更やファイル編集はせず、回答のみ行ってください。
-
-質問: $ARGUMENTS
-MD
-    'update-agents-md.md' => <<'MD',
----
-description: これまでの変更を踏まえてAGENTS.mdを更新する
----
-
-このセッションでの変更を踏まえて、`AGENTS.md` を実態に合わせて更新してください。
-
-- 変更された仕様・コマンド・ディレクトリ構成を反映する
-- 古くなった記述は削除または修正する
-- 既存の構成やトーンは維持し、差分は最小限にする
-
-MD
-    'git-commit.md' => <<'MD',
----
-description: ここまでの変更をgit commitする
----
-
-ここまでの変更を `git commit` してください。
-
-- コミットメッセージは、日本語で簡潔かつ分かりやすく書いてください。
-- 変更内容が一目で分かる1行目(50文字程度)にしてください。必要な場合のみ、空行のあとに補足を書いてください。
-- `Co-Authored-By: Claude ...` や `🤖 Generated with Claude Code` などの署名・クレジット行は、コミットメッセージに含めないでください。
-MD
-    'update-agents-and-git.md' => <<'MD',
----
-description: AGENTS.mdを更新してからgit commitする
----
-
-次の順に実行してください。
-
-1. このセッションでの変更を踏まえて、`AGENTS.md` を実態に合わせて更新する(既存の構成やトーンは維持し、差分は最小限にする)
-2. `AGENTS.md` を含むここまでの変更を `git commit` する
-
-- コミットメッセージは、日本語で簡潔かつ分かりやすく書いてください。1行目は50文字程度にしてください。
-- `Co-Authored-By: Claude ...` や `🤖 Generated with Claude Code` などの署名・クレジット行は、コミットメッセージに含めないでください。
-MD
-    'todo.md' => <<'MD',
----
-description: 実装計画を立てて todo/ に連番のTODOファイルを作成する
-argument-hint: <実装したい内容>
-allowed-tools: Bash(ls:*), Bash(tail:*), Read, Glob, Grep, Write, AskUserQuestion
----
-
-## 依頼内容
-$ARGUMENTS
-
-## 最新のTODOファイル（最大5件）
-!`ls todo/ | tail -5`
-
-## 手順
-1. 依頼内容を理解し、関連するコードを Glob / Grep / Read で調査する
-2. 仕様・方針・範囲などで不明点や判断が分かれる点があれば、AskUserQuestion で質問して回答を待つ（推測で進めない）
-3. 回答を踏まえて実装計画を立てる
-4. 既存ファイルの最大番号に +1 した番号を3桁ゼロ埋めで決める（ファイルがなければ 001）
-5. `todo/NNN-todo.md` を作成する（例: 既存が 002 までなら `todo/003-todo.md`）
-
-## TODOファイルの形式
-# <タイトル>
-
-## 概要
-何を・なぜ実装するか
-
-## 調査結果
-関連ファイルと現状の構成
-
-## 実装計画
-- [ ] ステップ1: 具体的な作業内容（対象ファイル）
-- [ ] ステップ2: ...
-
-## テスト・確認方法
-- [ ] ...
-
-## 決定事項
-質問への回答で決まったこと
-
-## 懸念点・未決事項
-- ...
-
-## 注意
-- 計画の作成のみ行い、コードの実装はしないこと
-- 質問は調査後にまとめて行い、コードを読めば分かることは聞かないこと
-- 作成後、ファイルパスと計画の要約を報告すること
-MD
-);
+# テンプレートを読み込む(build後は .bin/templates、開発時は ../templates)
+my ($tpl) = grep { -d } ("$Bin/templates/init_claude", "$Bin/../templates/init_claude");
+die "テンプレートが見つかりません\n" unless $tpl;
+my %commands = map { basename($_) => fread($_) } bsd_glob("$tpl/commands/*.md");
 make_path('.claude/commands');
 for my $name (sort keys %commands) {
     my $file = ".claude/commands/$name";
@@ -185,22 +104,9 @@ unless (-f $opencode_file) {
     print "Created: $opencode_file\n";
 }
 
-# AGENTS.md のテンプレート
-my $content = <<'MD';
-<<ここにプロジェクトの名前を入れる>>
-
-<<ここにプロジェクトの概要を２，３行程度で入れる>>
-
-## プロジェクトの取り組み方について
-
-* なるべくコードやコメントをシンプルに簡潔にすること。
-* コメントはUTF-8の日本語で書くこと。
-* 問題に取り組む前に、コードや仕様を読んで理解すること。
-MD
-
 # 未作成のときのみ生成する
 unless (-f 'AGENTS.md') {
-    fwrite('AGENTS.md', $content);
+    fwrite('AGENTS.md', fread("$tpl/AGENTS.md"));
     print "Created: AGENTS.md\n";
 }
 

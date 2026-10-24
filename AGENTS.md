@@ -11,6 +11,7 @@
 
 ```
 .
+├── templates/   # init_claude が読み込む雛形 (build で .bin*/templates にコピー)
 ├── unix/        # bash スクリプト or perlスクリプト
 │   └── shell/   # ~/.bashrc から source するシェル関数 (build_unix.sh の対象外)
 └── windows/     # PowerShell スクリプト
@@ -19,7 +20,7 @@
 
 ### 共通
 
-- 各スクリプトは独立している（相互依存なし）
+- 各スクリプトは独立している（相互依存なし）。ただし init_claude は `templates/` を読み込む（build で `.bin*/templates` にコピーされる）
 - 機能・動作は元スクリプトと同等にすること
 - スクリプト冒頭にコメントで元ファイル名と用途を記載すること
 

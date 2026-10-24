@@ -1,4 +1,5 @@
 # windows/ にある .ps1 スクリプトを .bin_win/ へコピーする。
+# templates\ も .bin_win\templates へコピーする。
 # 使い方: .\build_win.ps1
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -13,6 +14,11 @@ foreach ($f in Get-ChildItem -Path $winDir -Filter "*.ps1") {
     $dest = Join-Path $binDir $f.Name
     Copy-Item -Path $f.FullName -Destination $dest -Force
 }
+
+# スクリプトが読み込むテンプレートも .bin_win\templates にコピーする
+$tplDest = Join-Path $binDir "templates"
+if (Test-Path $tplDest) { Remove-Item $tplDest -Recurse -Force }
+Copy-Item -Path (Join-Path $scriptDir "templates") -Destination $tplDest -Recurse
 
 Write-Host "完了: $binDir"
 
