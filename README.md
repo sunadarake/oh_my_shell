@@ -33,22 +33,26 @@ $env:PATH = "C:\path\to\oh_my_shell\.bin_win;$env:PATH"
 tt .claude/settings.json src/main.js  # ファイルを親ディレクトリごと作成
 ggc "メッセージ"                      # git add . と git commit (省略時は日時と変更ファイル一覧)
 ggp                                   # git push origin main
-init_claude                           # AGENTS.md / .claude/settings.json / .claude/skills/ の雛形を作成
+init_claude                           # AGENTS.md / .claude/settings.json / .claude/skills/ / .opencode/skills/ / opencode.json の雛形を作成
 oo /path/to/open                      # ファイルマネージャーで開く
 ```
 
 `init_claude` は旧版の `.claude/commands/` を削除しない。同名の skill と重複するので手動で削除すること。
 
+## 仕様
+
 シェル関数 (`functions.sh` / `functions.ps1`):
 
-- `mkcd <dir>` : ディレクトリを作成して移動
-- `cd 2` : `cd ../..` と同じ
-- `cdd` / `cdp` / `cdv` / `cdl` : Documents / Pictures / Videos / Downloads へ移動
+| 関数 | 説明 |
+|:-|:-|
+| `mkcd <dir>` | ディレクトリを作成して移動 |
+| `cd 2` | `cd ../..` と同じ |
+| `cdd` / `cdp` / `cdv` / `cdl` | Documents / Pictures / Videos / Downloads へ移動 |
 
 その他のコマンド:
 
-| コマンド | 内容 |
-|---|---|
+| コマンド | 説明 |
+|:-|:-|
 | `ggf` | `git pull origin main` |
 | `ggr` | 変更を破棄して直前のコミットに戻す (Windows のみ) |
 | `ccc` | 標準入力 / ファイルをクリップボードへコピー |
