@@ -72,7 +72,7 @@ oo /path/to/open
 `git add .` と `git commit` をまとめて実行します。
 
 ```bash
-# デフォルトメッセージ "update" でコミット
+# "Update: 日時 (N files)" と変更ファイル一覧のメッセージでコミット
 ggc
 
 # カスタムメッセージでコミット
