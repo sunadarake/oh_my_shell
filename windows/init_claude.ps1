@@ -100,6 +100,53 @@ description: AGENTS.mdを更新してからgit commitする
 - コミットメッセージは、日本語で簡潔かつ分かりやすく書いてください。1行目は50文字程度にしてください。
 - `Co-Authored-By: Claude ...` や `🤖 Generated with Claude Code` などの署名・クレジット行は、コミットメッセージに含めないでください。
 '@
+    'todo.md' = @'
+---
+description: 実装計画を立てて todo/ に連番のTODOファイルを作成する
+argument-hint: <実装したい内容>
+allowed-tools: Bash(ls:*), Bash(tail:*), Read, Glob, Grep, Write, AskUserQuestion
+---
+
+## 依頼内容
+$ARGUMENTS
+
+## 最新のTODOファイル（最大5件）
+!`ls todo/ | tail -5`
+
+## 手順
+1. 依頼内容を理解し、関連するコードを Glob / Grep / Read で調査する
+2. 仕様・方針・範囲などで不明点や判断が分かれる点があれば、AskUserQuestion で質問して回答を待つ（推測で進めない）
+3. 回答を踏まえて実装計画を立てる
+4. 既存ファイルの最大番号に +1 した番号を3桁ゼロ埋めで決める（ファイルがなければ 001）
+5. `todo/NNN-todo.md` を作成する（例: 既存が 002 までなら `todo/003-todo.md`）
+
+## TODOファイルの形式
+# <タイトル>
+
+## 概要
+何を・なぜ実装するか
+
+## 調査結果
+関連ファイルと現状の構成
+
+## 実装計画
+- [ ] ステップ1: 具体的な作業内容（対象ファイル）
+- [ ] ステップ2: ...
+
+## テスト・確認方法
+- [ ] ...
+
+## 決定事項
+質問への回答で決まったこと
+
+## 懸念点・未決事項
+- ...
+
+## 注意
+- 計画の作成のみ行い、コードの実装はしないこと
+- 質問は調査後にまとめて行い、コードを読めば分かることは聞かないこと
+- 作成後、ファイルパスと計画の要約を報告すること
+'@
 }
 foreach ($name in $slashCommands.Keys) {
     $file = Join-Path $commandsDir $name
@@ -109,13 +156,13 @@ foreach ($name in $slashCommands.Keys) {
     }
 }
 
-# OpenCode: .opencode\commands に同じコマンドを追加する(argument-hint は未対応のため除く)
+# OpenCode: .opencode\commands に同じコマンドを追加する(argument-hint / allowed-tools は未対応のため除く)
 $ocCommandsDir = '.opencode\commands'
 New-Item -ItemType Directory -Path $ocCommandsDir -Force | Out-Null
 foreach ($name in $slashCommands.Keys) {
     $file = Join-Path $ocCommandsDir $name
     if (-not (Test-Path $file)) {
-        $body = $slashCommands[$name] -replace '(?m)^argument-hint:.*\r?\n', '' -replace 'CLAUDE\.md', 'AGENTS.md'
+        $body = $slashCommands[$name] -replace '(?m)^(argument-hint|allowed-tools):.*\r?\n', '' -replace 'CLAUDE\.md', 'AGENTS.md'
         Set-Content $file $body -Encoding UTF8NoBOM
         Write-Output "Created: $file"
     }
