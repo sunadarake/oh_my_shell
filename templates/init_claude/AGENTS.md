@@ -16,7 +16,7 @@
 
 ## ディレクトリ構成
 - `src/` <<説明>>
-- `todo/` 実装計画（`/todo-plan` で作成、`NNN-todo.md` 形式）
+- `todo/` 実装計画（`/todo-plan` で作成、`/todo-refine` で詰める、`NNN-todo.md` 形式）
 
 ## 作業の進め方
 - 作業の前に、関連するコードと仕様を読んで理解する
