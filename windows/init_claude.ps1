@@ -3,15 +3,15 @@
 # 使い方: .\init_claude.ps1 [-Update]  (-Update: 設定・コマンドを上書き。AGENTS.md は変更しない)
 param([switch]$Update, [Alias('h')][switch]$Help)
 
-if ($Help) {
+if ($Help -or $args -contains '--help') {
     @'
-使い方: init_claude [-Update] [-h|-Help]
+使い方: init_claude [-Update] [-h|-Help|--help]
 
 Claude Code / OpenCode の設定ファイルをカレントディレクトリに作成する。
 
   -Update     settings.json / commands / opencode.json を上書きする
               (AGENTS.md は変更しない)
-  -h, -Help   このヘルプを表示する
+  -h, -Help, --help  このヘルプを表示する
 '@
     return
 }

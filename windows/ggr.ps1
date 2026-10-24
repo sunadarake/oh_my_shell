@@ -4,6 +4,18 @@
 # 使い方:
 #   ./ggr.ps1
 
+if ($args.Count -gt 0 -and $args[0] -in '-h', '--help') {
+    @'
+使い方: ggr [-h|--help]
+
+git の変更をすべて破棄し、直前のコミット状態に戻す。
+未追跡ファイルは削除されない (git clean が必要)。
+
+  -h, --help  このヘルプを表示する
+'@
+    return
+}
+
 # git リポジトリ内かチェック
 git rev-parse --is-inside-work-tree 2>$null | Out-Null
 if ($LASTEXITCODE -ne 0) {

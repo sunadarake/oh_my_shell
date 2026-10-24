@@ -1,6 +1,18 @@
 # open-webui - Open WebUIを起動する
 # 元ファイル: shell/open-webui.sh
 
+if ($args.Count -gt 0 -and $args[0] -in '-h', '--help') {
+    @'
+使い方: open-webui [-h|--help]
+
+Open WebUI を起動する。
+初回のみ %USERPROFILE%\open-webui-server を作成し、依存パッケージを追加する。
+
+  -h, --help  このヘルプを表示する
+'@
+    return
+}
+
 if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
     Write-Error "uv is not installed"
     exit 1

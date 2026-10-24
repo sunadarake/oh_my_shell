@@ -3,8 +3,22 @@
 # 使い方: tre [-I <pattern>] [path]
 param(
     [string[]]$I = @(),
-    [string]$Path = "."
+    [string]$Path = ".",
+    [Alias('h')][switch]$Help
 )
+
+if ($Help -or $Path -eq '--help') {
+    @'
+使い方: tre [-I パターン[,パターン...]] [パス] [-h|--help]
+
+ビルドディレクトリなどを除外してディレクトリツリーを表示する。
+
+  -I パターン  除外パターンを追加する (複数指定可)
+  -h, --help   このヘルプを表示する
+'@
+    return
+}
+
 $ignore = @(
     'node_modules', '.dart_tool', '.flutter-plugins', '.flutter-plugins-dependencies',
     '__pycache__', '.venv', 'venv', 'env', '*.egg-info', '.pytest_cache',

@@ -2,7 +2,20 @@
 # 元ファイル: shell/ccc.sh
 # 使い方: Get-Content file.txt | ccc  または  ccc file.txt
 
-param([string]$FilePath)
+param([string]$FilePath, [Alias('h')][switch]$Help)
+
+if ($Help -or $FilePath -eq '--help') {
+    @'
+使い方: ccc [ファイル] [-h|--help]
+
+ファイルまたはパイプで渡した内容をクリップボードにコピーする。
+
+  Get-Content file.txt | ccc
+  ccc file.txt
+  -h, --help  このヘルプを表示する
+'@
+    return
+}
 
 $piped = @($input)
 if ($piped.Count -gt 0) {

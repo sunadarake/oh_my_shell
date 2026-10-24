@@ -4,9 +4,29 @@
 #   例: dcp C:\path\to\sample.py 001_oreore  ->  C:\path\to\001_oreore.py
 
 param(
-    [Parameter(Mandatory = $true)][string]$Source,
-    [Parameter(Mandatory = $true)][string]$NewName
+    [string]$Source,
+    [string]$NewName,
+    [Alias('h')][switch]$Help
 )
+
+if ($Help -or $Source -eq '--help') {
+    @'
+使い方: dcp <コピー元ファイル> <新しい名前> [-h|--help]
+
+コピー元と同じディレクトリにファイルをコピーする。
+新しい名前に拡張子が無ければ、コピー元の拡張子を付ける。
+
+  dcp C:\path\to\sample.py 001_oreore.py
+  dcp C:\path\to\sample.py 001_oreore   (-> C:\path\to\001_oreore.py)
+  -h, --help  このヘルプを表示する
+'@
+    return
+}
+
+if (-not $Source -or -not $NewName) {
+    Write-Error "使い方: dcp <コピー元ファイル> <新しい名前>"
+    exit 1
+}
 
 if (-not (Test-Path -LiteralPath $Source -PathType Leaf)) {
     Write-Error "dcp: no such file: $Source"

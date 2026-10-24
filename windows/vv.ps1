@@ -2,7 +2,18 @@
 # 元ファイル: shell/vv.sh
 # 使い方: vv <file>
 
-param([string]$File)
+param([string]$File, [Alias('h')][switch]$Help)
+
+if ($Help -or $File -eq '--help') {
+    @'
+使い方: vv <ファイル> [-h|--help]
+
+ファイルを別ターミナルで vim で開く。
+
+  -h, --help  このヘルプを表示する
+'@
+    return
+}
 
 if (-not $File) {
     Write-Error "Usage: vv <file>"

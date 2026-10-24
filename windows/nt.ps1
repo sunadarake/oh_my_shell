@@ -2,6 +2,18 @@
 # 元ファイル: perl/nt.pl
 # 使い方: nt [ファイル名 [枚数]]  または  nt [枚数]
 
+if ($args.Count -gt 0 -and $args[0] -in '-h', '--help') {
+    @'
+使い方: nt [ファイル名 [枚数]] | nt [枚数] [-h|--help]
+
+todo ディレクトリに連番の todo ファイル (000-todo.md) を作成する。
+ファイル名を指定すると、カレントディレクトリに連番付きの空ファイルを作成する (枚数の既定は 3)。
+
+  -h, --help  このヘルプを表示する
+'@
+    return
+}
+
 $baseFile = $null
 $count = 1
 

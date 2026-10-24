@@ -1,12 +1,14 @@
 #Requires -Version 7.0
 [CmdletBinding()]
 param(
-    [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet('stash', 'restore', 'list')]
+    [Parameter(Position = 0)]
+    [ValidateSet('stash', 'restore', 'list', '--help')]
     [string]$Command,
 
     [Parameter(Position = 1, ValueFromRemainingArguments = $true)]
-    [string[]]$Paths
+    [string[]]$Paths,
+
+    [Alias('h')][switch]$Help
 )
 
 $ErrorActionPreference = 'Stop'
@@ -15,8 +17,10 @@ $StashDir = Join-Path $HOME '.claude_stash'
 $Manifest = Join-Path $StashDir 'manifest.tsv'
 
 function Show-Usage {
+    param([int]$Code = 1)
     @"
 使い方:
+  claude_stash.ps1 -h | --help               # このヘルプを表示
   claude_stash.ps1 stash <dir1> [dir2 ...]   # ディレクトリを退避
   claude_stash.ps1 restore [dir1 ...]        # 退避したディレクトリを元に戻す（省略時は全部）
   claude_stash.ps1 list                      # 退避中の一覧を表示
@@ -28,7 +32,7 @@ function Show-Usage {
   claude_stash.ps1 restore secrets\
   claude_stash.ps1 restore
 "@ | Write-Host
-    exit 1
+    exit $Code
 }
 
 function ConvertTo-StashName {
@@ -162,6 +166,8 @@ function Show-List {
         Write-Host "  -> $($e.Stash)"
     }
 }
+
+if ($Help -or $Command -eq '--help') { Show-Usage -Code 0 }
 
 switch ($Command) {
     'stash' {

@@ -2,6 +2,18 @@
 # 元ファイル: perl/ntv.pl
 # 使い方: ntv
 
+if ($args.Count -gt 0 -and $args[0] -in '-h', '--help') {
+    @'
+使い方: ntv [-h|--help]
+
+todo ディレクトリの最新の todo ファイルを vim で開く。
+最新のファイルが空ならそれを開き、空でなければ次の連番を作成して開く。
+
+  -h, --help  このヘルプを表示する
+'@
+    return
+}
+
 if (-not (Get-Command vim -ErrorAction SilentlyContinue)) {
     Write-Error "エラー: vim が見つかりません。vim がインストールされていることを確認してください。"
     exit 1
