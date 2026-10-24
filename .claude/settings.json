@@ -1,9 +1,4 @@
 {
-   "attribution" : {
-      "commit" : "",
-      "pr" : ""
-   },
-   "includeCoAuthoredBy" : false,
    "permissions" : {
       "allow" : [
          "Bash(rg:*)",
@@ -53,5 +48,10 @@
          "Read(~/.ssh/**)",
          "Read(./.env)"
       ]
+   },
+   "includeCoAuthoredBy" : false,
+   "attribution" : {
+      "commit" : "",
+      "pr" : ""
    }
 }
