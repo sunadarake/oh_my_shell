@@ -21,7 +21,8 @@
 ### 共通
 
 - 各スクリプトは独立している（相互依存なし）。ただし init_claude は `templates/` を読み込む（build で `.bin*/templates` にコピーされる）
-- init_claude は `--update` (PowerShell は `-Update`) で settings.json / commands / opencode.json を上書きする。AGENTS.md は上書きしない
+- skill の雛形は `templates/init_claude/skill/<名>.md` に置く。init_claude が `name:` を補って `.claude/skills/<名>/SKILL.md` と `.opencode/skills/<名>/SKILL.md` を生成する
+- init_claude は `--update` (PowerShell は `-Update`) で settings.json / skills / opencode.json を上書きする。AGENTS.md は上書きしない
 - 機能・動作は元スクリプトと同等にすること
 - スクリプト冒頭にコメントで元ファイル名と用途を記載すること
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # 元ファイル: perl/init_claude.pl - Claude Code / OpenCode設定ファイルを初期化
-# 使い方: perl init_claude.pl [--update]  (--update: 設定・コマンドを上書き。AGENTS.md は変更しない)
+# 使い方: perl init_claude.pl [--update]  (--update: 設定・skill を上書き。AGENTS.md は変更しない)
 
 use strict;
 use warnings;
@@ -36,7 +36,7 @@ if (grep { $_ eq '-h' || $_ eq '--help' } @ARGV) {
 
 Claude Code / OpenCode の設定ファイルをカレントディレクトリに作成する。
 
-  --update    settings.json / commands / opencode.json を上書きする
+  --update    settings.json / skills / opencode.json を上書きする
               (AGENTS.md は変更しない)
   -h, --help  このヘルプを表示する
 EOT
@@ -80,24 +80,28 @@ my $settings = {
 };
 put($settings_file, JSON::PP->new->utf8->pretty->encode($settings));
 
-# .claude/commands にスラッシュコマンドを追加する
+# .claude/skills/<名>/SKILL.md に skill を追加する
 # テンプレートを読み込む(build後は .bin/templates、開発時は ../templates)
 my ($tpl) = grep { -d } ("$Bin/templates/init_claude", "$Bin/../templates/init_claude");
 die "テンプレートが見つかりません\n" unless $tpl;
-my %commands = map { basename($_) => fread($_) } bsd_glob("$tpl/commands/*.md");
-make_path('.claude/commands');
-for my $name (sort keys %commands) {
-    my $file = ".claude/commands/$name";
-    put($file, $commands{$name});
+# frontmatter 先頭に name: を差し込む
+my %skills = map {
+    my $name = basename($_, '.md');
+    (my $body = fread($_)) =~ s/\A---\n/---\nname: $name\n/;
+    ($name => $body);
+} bsd_glob("$tpl/skill/*.md");
+for my $name (sort keys %skills) {
+    make_path(".claude/skills/$name");
+    put(".claude/skills/$name/SKILL.md", $skills{$name});
 }
 
-# OpenCode: .opencode/commands に同じコマンドを追加する(argument-hint / allowed-tools は未対応のため除く)
-make_path('.opencode/commands');
-for my $name (sort keys %commands) {
-    my $file = ".opencode/commands/$name";
-    (my $body = $commands{$name}) =~ s/^(?:argument-hint|allowed-tools):.*\n//mg;
+# OpenCode: .opencode/skills に同じ skill を追加する(argument-hint / allowed-tools は未対応のため除く)
+# TODO: OpenCode の skill で $ARGUMENTS が展開されるか未確認
+for my $name (sort keys %skills) {
+    make_path(".opencode/skills/$name");
+    (my $body = $skills{$name}) =~ s/^(?:argument-hint|allowed-tools):.*\n//mg;
     $body =~ s/CLAUDE\.md/AGENTS.md/g;
-    put($file, $body);
+    put(".opencode/skills/$name/SKILL.md", $body);
 }
 
 # OpenCode: opencode.json に permission を設定する(後勝ちのため "*" を先頭に置く)

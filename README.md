@@ -94,7 +94,9 @@ ggp origin feature-branch
 
 ### init_claude Claudeの雛形を作成する
 
-現在のディレクトリに AGENTS.mdや .claude/settings.jsonを作成する
+現在のディレクトリに AGENTS.mdや .claude/settings.json、.claude/skills/ を作成する
+
+旧版の `.claude/commands/` は削除されない。同名の skill と重複するので手動で削除すること。
 
 ```bash
 init_claude

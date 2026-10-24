@@ -1,15 +1,5 @@
 {
-   "attribution" : {
-      "commit" : "",
-      "pr" : ""
-   },
    "permissions" : {
-      "deny" : [
-         "Bash(rm -rf:*)",
-         "Bash(git push --force:*)",
-         "Read(~/.ssh/**)",
-         "Read(./.env)"
-      ],
       "allow" : [
          "Bash(rg:*)",
          "Bash(grep:*)",
@@ -51,7 +41,17 @@
          "Edit(*)",
          "Write(*)",
          "mcp__voicevox__speak"
+      ],
+      "deny" : [
+         "Bash(rm -rf:*)",
+         "Bash(git push --force:*)",
+         "Read(~/.ssh/**)",
+         "Read(./.env)"
       ]
    },
-   "includeCoAuthoredBy" : false
+   "includeCoAuthoredBy" : false,
+   "attribution" : {
+      "pr" : "",
+      "commit" : ""
+   }
 }

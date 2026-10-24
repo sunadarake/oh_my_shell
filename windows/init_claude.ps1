@@ -1,6 +1,6 @@
 # init_claude - Claude Code / OpenCode設定ファイルを初期化
 # 元ファイル: perl/init_claude.pl
-# 使い方: .\init_claude.ps1 [-Update]  (-Update: 設定・コマンドを上書き。AGENTS.md は変更しない)
+# 使い方: .\init_claude.ps1 [-Update]  (-Update: 設定・skill を上書き。AGENTS.md は変更しない)
 param([switch]$Update, [Alias('h')][switch]$Help)
 
 if ($Help -or $args -contains '--help') {
@@ -9,7 +9,7 @@ if ($Help -or $args -contains '--help') {
 
 Claude Code / OpenCode の設定ファイルをカレントディレクトリに作成する。
 
-  -Update     settings.json / commands / opencode.json を上書きする
+  -Update     settings.json / skills / opencode.json を上書きする
               (AGENTS.md は変更しない)
   -h, -Help, --help  このヘルプを表示する
 '@
@@ -66,28 +66,27 @@ $settings = @{
 }
 Write-IfNeeded $settingsFile ($settings | ConvertTo-Json -Depth 5)
 
-# .claude\commands にスラッシュコマンドを追加する
-$commandsDir = '.claude\commands'
-New-Item -ItemType Directory -Path $commandsDir -Force | Out-Null
-
 # テンプレートを読み込む(build後は .bin_win\templates、開発時は ..\templates)
 $tplDir = @("$PSScriptRoot\templates\init_claude", "$PSScriptRoot\..\templates\init_claude") |
     Where-Object { Test-Path $_ } | Select-Object -First 1
 if (-not $tplDir) { throw 'テンプレートが見つかりません' }
-$slashCommands = @{}
-foreach ($f in Get-ChildItem "$tplDir\commands" -Filter '*.md') {
-    $slashCommands[$f.Name] = Get-Content $f.FullName -Raw -Encoding UTF8
+
+# .claude\skills\<名>\SKILL.md に skill を追加する(frontmatter 先頭に name: を差し込む)
+$skills = [ordered]@{}
+foreach ($f in Get-ChildItem "$tplDir\skill" -Filter '*.md') {
+    $skills[$f.BaseName] = (Get-Content $f.FullName -Raw -Encoding UTF8) -replace '\A---\r?\n', "---`nname: $($f.BaseName)`n"
 }
-foreach ($name in $slashCommands.Keys) {
-    Write-IfNeeded (Join-Path $commandsDir $name) $slashCommands[$name]
+foreach ($name in $skills.Keys) {
+    New-Item -ItemType Directory -Path ".claude\skills\$name" -Force | Out-Null
+    Write-IfNeeded ".claude\skills\$name\SKILL.md" $skills[$name]
 }
 
-# OpenCode: .opencode\commands に同じコマンドを追加する(argument-hint / allowed-tools は未対応のため除く)
-$ocCommandsDir = '.opencode\commands'
-New-Item -ItemType Directory -Path $ocCommandsDir -Force | Out-Null
-foreach ($name in $slashCommands.Keys) {
-    $body = $slashCommands[$name] -replace '(?m)^(argument-hint|allowed-tools):.*\r?\n', '' -replace 'CLAUDE\.md', 'AGENTS.md'
-    Write-IfNeeded (Join-Path $ocCommandsDir $name) $body
+# OpenCode: .opencode\skills に同じ skill を追加する(argument-hint / allowed-tools は未対応のため除く)
+# TODO: OpenCode の skill で $ARGUMENTS が展開されるか未確認
+foreach ($name in $skills.Keys) {
+    $body = $skills[$name] -replace '(?m)^(argument-hint|allowed-tools):.*\r?\n', '' -replace 'CLAUDE\.md', 'AGENTS.md'
+    New-Item -ItemType Directory -Path ".opencode\skills\$name" -Force | Out-Null
+    Write-IfNeeded ".opencode\skills\$name\SKILL.md" $body
 }
 
 # OpenCode: opencode.json に permission を設定する(後勝ちのため "*" を先頭に置く)
