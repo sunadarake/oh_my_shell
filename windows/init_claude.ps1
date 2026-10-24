@@ -34,39 +34,37 @@ $commands = @(
 )
 
 $settingsFile = '.claude\settings.json'
-if ($true) {
-    New-Item -ItemType Directory -Path '.claude' -Force | Out-Null
+New-Item -ItemType Directory -Path '.claude' -Force | Out-Null
 
-    # Bash用の許可コマンド
-    $bashAllow = foreach ($cmd in $commands) { "Bash(${cmd}:*)" }
+# Bash用の許可コマンド
+$bashAllow = foreach ($cmd in $commands) { "Bash(${cmd}:*)" }
 
-    # PowerShell（Windows環境）用の許可コマンド
-    $psAllow = foreach ($cmd in $commands) { "PowerShell(${cmd}:*)" }
-    # 上記に対応するPowerShellネイティブのコマンドレットも許可
-    $psNativeCommands = @(
-        'Get-ChildItem','Get-Content','Select-String','Get-Item','Test-Path',
-        'Copy-Item','Move-Item','New-Item','Remove-Item',
-        'Sort-Object','Get-Location','Set-Location','Measure-Object','Compare-Object'
-    )
-    $psAllow = @($psAllow) + $(foreach ($cmd in $psNativeCommands) { "PowerShell(${cmd}:*)" })
+# PowerShell（Windows環境）用の許可コマンド
+$psAllow = foreach ($cmd in $commands) { "PowerShell(${cmd}:*)" }
+# 上記に対応するPowerShellネイティブのコマンドレットも許可
+$psNativeCommands = @(
+    'Get-ChildItem','Get-Content','Select-String','Get-Item','Test-Path',
+    'Copy-Item','Move-Item','New-Item','Remove-Item',
+    'Sort-Object','Get-Location','Set-Location','Measure-Object','Compare-Object'
+)
+$psAllow = @($psAllow) + $(foreach ($cmd in $psNativeCommands) { "PowerShell(${cmd}:*)" })
 
-    $allow = @($bashAllow) + @($psAllow) + @('Bash(git:*)', 'PowerShell(git:*)', 'List(*)', 'Edit(*)', 'Write(*)', 'mcp__voicevox__speak')
+$allow = @($bashAllow) + @($psAllow) + @('Bash(git:*)', 'PowerShell(git:*)', 'List(*)', 'Edit(*)', 'Write(*)', 'mcp__voicevox__speak')
 
-    $settings = @{
-        permissions = @{
-            allow = $allow
-            # 危険な操作と機密ファイルの読み取りを拒否する
-            deny  = @(
-                'Bash(rm -rf:*)', 'Bash(git push --force:*)',
-                'Read(~/.ssh/**)', 'Read(./.env)'
-            )
-        }
-        # 署名(Co-Authored-By等)をコミット・PRに付けない
-        attribution = @{ commit = ''; pr = '' }
-        includeCoAuthoredBy = $false
+$settings = @{
+    permissions = @{
+        allow = $allow
+        # 危険な操作と機密ファイルの読み取りを拒否する
+        deny  = @(
+            'Bash(rm -rf:*)', 'Bash(git push --force:*)',
+            'Read(~/.ssh/**)', 'Read(./.env)'
+        )
     }
-    Write-IfNeeded $settingsFile ($settings | ConvertTo-Json -Depth 5)
+    # 署名(Co-Authored-By等)をコミット・PRに付けない
+    attribution = @{ commit = ''; pr = '' }
+    includeCoAuthoredBy = $false
 }
+Write-IfNeeded $settingsFile ($settings | ConvertTo-Json -Depth 5)
 
 # .claude\commands にスラッシュコマンドを追加する
 $commandsDir = '.claude\commands'
@@ -94,19 +92,17 @@ foreach ($name in $slashCommands.Keys) {
 
 # OpenCode: opencode.json に permission を設定する(後勝ちのため "*" を先頭に置く)
 $opencodeFile = 'opencode.json'
-if ($true) {
-    $config = [ordered]@{
-        '$schema'  = 'https://opencode.ai/config.json'
-        permission = [ordered]@{
-            '*'                = 'allow'
-            edit               = 'allow'
-            webfetch           = 'allow'
-            external_directory = 'ask'
-            bash               = [ordered]@{ '*' = 'allow'; 'rm *' = 'ask'; 'rmdir *' = 'ask' }
-        }
+$config = [ordered]@{
+    '$schema'  = 'https://opencode.ai/config.json'
+    permission = [ordered]@{
+        '*'                = 'allow'
+        edit               = 'allow'
+        webfetch           = 'allow'
+        external_directory = 'ask'
+        bash               = [ordered]@{ '*' = 'allow'; 'rm *' = 'ask'; 'rmdir *' = 'ask' }
     }
-    Write-IfNeeded $opencodeFile ($config | ConvertTo-Json -Depth 5)
 }
+Write-IfNeeded $opencodeFile ($config | ConvertTo-Json -Depth 5)
 
 if (-not (Test-Path 'AGENTS.md')) {
     Set-Content 'AGENTS.md' (Get-Content "$tplDir\AGENTS.md" -Raw -Encoding UTF8) -Encoding UTF8NoBOM

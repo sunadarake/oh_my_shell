@@ -63,25 +63,22 @@ my @commands = qw(
 
 my $settings_file = '.claude/settings.json';
 make_path('.claude');
-{
+my @allow = map { "Bash($_:*)" } @commands;
+push @allow, "Bash(git:*)", "List(*)", "Edit(*)", "Write(*)", "mcp__voicevox__speak";
 
-    my @allow = map { "Bash($_:*)" } @commands;
-    push @allow, "Bash(git:*)", "List(*)", "Edit(*)", "Write(*)", "mcp__voicevox__speak";
+# 危険な操作と機密ファイルの読み取りを拒否する
+my @deny = (
+    "Bash(rm -rf:*)", "Bash(git push --force:*)",
+    "Read(~/.ssh/**)", "Read(./.env)",
+);
 
-    # 危険な操作と機密ファイルの読み取りを拒否する
-    my @deny = (
-        "Bash(rm -rf:*)", "Bash(git push --force:*)",
-        "Read(~/.ssh/**)", "Read(./.env)",
-    );
-
-    # 署名(Co-Authored-By等)をコミット・PRに付けない
-    my $settings = {
-        permissions => { allow => \@allow, deny => \@deny },
-        attribution => { commit => '', pr => '' },
-        includeCoAuthoredBy => JSON::PP::false,
-    };
-    put($settings_file, JSON::PP->new->utf8->pretty->encode($settings));
-}
+# 署名(Co-Authored-By等)をコミット・PRに付けない
+my $settings = {
+    permissions => { allow => \@allow, deny => \@deny },
+    attribution => { commit => '', pr => '' },
+    includeCoAuthoredBy => JSON::PP::false,
+};
+put($settings_file, JSON::PP->new->utf8->pretty->encode($settings));
 
 # .claude/commands にスラッシュコマンドを追加する
 # テンプレートを読み込む(build後は .bin/templates、開発時は ../templates)
@@ -105,19 +102,17 @@ for my $name (sort keys %commands) {
 
 # OpenCode: opencode.json に permission を設定する(後勝ちのため "*" を先頭に置く)
 my $opencode_file = 'opencode.json';
-{
-    my $config = {
-        '$schema'  => 'https://opencode.ai/config.json',
-        permission => {
-            '*'                => 'allow',
-            edit               => 'allow',
-            webfetch           => 'allow',
-            external_directory => 'ask',
-            bash               => { '*' => 'allow', 'rm *' => 'ask', 'rmdir *' => 'ask' },
-        },
-    };
-    put($opencode_file, JSON::PP->new->utf8->pretty->canonical->encode($config));
-}
+my $config = {
+    '$schema'  => 'https://opencode.ai/config.json',
+    permission => {
+        '*'                => 'allow',
+        edit               => 'allow',
+        webfetch           => 'allow',
+        external_directory => 'ask',
+        bash               => { '*' => 'allow', 'rm *' => 'ask', 'rmdir *' => 'ask' },
+    },
+};
+put($opencode_file, JSON::PP->new->utf8->pretty->canonical->encode($config));
 
 # 未作成のときのみ生成する
 unless (-f 'AGENTS.md') {
