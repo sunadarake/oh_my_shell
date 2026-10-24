@@ -1,6 +1,18 @@
 #!/bin/bash
 # 元ファイル: shell/open-webui.sh - Open WebUIを起動する
 
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    cat <<'EOT'
+使い方: open-webui [-h|--help]
+
+Open WebUI を起動する。
+初回のみ ~/open-webui-server を作成し、依存パッケージを追加する。
+
+  -h, --help  このヘルプを表示する
+EOT
+    exit 0
+fi
+
 if ! command -v uv >/dev/null 2>&1; then
     echo "uv is not installed" >&2
     exit 1

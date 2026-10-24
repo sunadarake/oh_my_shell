@@ -3,6 +3,19 @@
 #   cat sample.md | ccc
 #   ccc sample.md
 
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    cat <<'EOT'
+使い方: ccc [ファイル] [-h|--help]
+
+ファイルまたは標準入力の内容をクリップボードにコピーする。
+
+  cat sample.md | ccc
+  ccc sample.md
+  -h, --help  このヘルプを表示する
+EOT
+    exit 0
+fi
+
 case "$(uname -s)" in
     Linux*)
         if ! command -v xclip >/dev/null 2>&1; then

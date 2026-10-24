@@ -6,6 +6,18 @@ use strict;
 use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
+
+if (@ARGV && ($ARGV[0] eq '-h' || $ARGV[0] eq '--help')) {
+    print <<'EOT';
+使い方: nt [ファイル名 [枚数]] | nt [枚数] [-h|--help]
+
+todo ディレクトリに連番の todo ファイル (000-todo.md) を作成する。
+ファイル名を指定すると、カレントディレクトリに連番付きの空ファイルを作成する (枚数の既定は 3)。
+
+  -h, --help  このヘルプを表示する
+EOT
+    exit 0;
+}
 use Cwd qw(cwd);
 use File::Basename qw(basename);
 use File::Find qw(find);

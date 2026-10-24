@@ -6,6 +6,18 @@ use strict;
 use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
+
+if (@ARGV && ($ARGV[0] eq '-h' || $ARGV[0] eq '--help')) {
+    print <<'EOT';
+使い方: ntv [-h|--help]
+
+todo ディレクトリの最新の todo ファイルを vim で開く。
+最新のファイルが空ならそれを開き、空でなければ次の連番を作成して開く。
+
+  -h, --help  このヘルプを表示する
+EOT
+    exit 0;
+}
 use Cwd qw(cwd);
 use File::Basename qw(basename);
 use File::Find qw(find);

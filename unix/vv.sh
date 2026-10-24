@@ -2,6 +2,17 @@
 # 元ファイル: shell/vv.sh - ファイルを別ターミナルでvimで開く
 #   vv <file>
 
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    cat <<'EOT'
+使い方: vv <ファイル> [-h|--help]
+
+ファイルを別ターミナルで vim で開く。
+
+  -h, --help  このヘルプを表示する
+EOT
+    exit 0
+fi
+
 if [ $# -eq 0 ]; then
     echo "Usage: $0 <file>" >&2
     exit 1

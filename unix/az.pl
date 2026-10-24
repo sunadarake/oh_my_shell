@@ -7,6 +7,19 @@ use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 
+if (@ARGV && ($ARGV[0] eq '-h' || $ARGV[0] eq '--help')) {
+    print <<'EOT';
+使い方: az <数> <演算子> <数> [-h|--help]
+
+CLI 上で暗算をする。演算子は英字で指定する (a=+ s=- m=* d=/)。
+
+  az 14 a 54
+  az 91 m 32
+  -h, --help  このヘルプを表示する
+EOT
+    exit 0;
+}
+
 my $expr = join(' ', @ARGV);
 # 英字演算子を記号に置換: a=+ s=- m=* d=/
 $expr =~ s/\ba\b/+/g;

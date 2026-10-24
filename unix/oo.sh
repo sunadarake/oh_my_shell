@@ -3,6 +3,20 @@
 #   oo /path/to/dir  oo ./
 #   引数を省略した場合はカレントディレクトリを開く
 
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    cat <<'EOT'
+使い方: oo [ディレクトリ] [-h|--help]
+
+指定したディレクトリをファイルマネージャーで開く。
+引数を省略するとカレントディレクトリを開く。
+
+  oo /path/to/dir
+  oo ./
+  -h, --help  このヘルプを表示する
+EOT
+    exit 0
+fi
+
 if [ $# -eq 0 ]; then
     d=$(pwd)
 else

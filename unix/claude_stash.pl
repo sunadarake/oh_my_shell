@@ -26,6 +26,7 @@ my $MANIFEST   = File::Spec->catfile($STASH_DIR, 'manifest.tsv');
 sub usage {
     print <<"USAGE";
 使い方:
+  $0 -h | --help               # このヘルプを表示
   $0 stash <dir1> [dir2 ...]   # ディレクトリを退避
   $0 restore [dir1 ...]        # 退避したディレクトリを元に戻す（省略時は全部）
   $0 list                      # 退避中の一覧を表示
@@ -37,8 +38,10 @@ sub usage {
   $0 restore secrets/
   $0 restore
 USAGE
-    exit 1;
+    exit($_[0] // 1);
 }
+
+usage(0) if @ARGV && ($ARGV[0] eq '-h' || $ARGV[0] eq '--help');
 
 my $cmd = shift @ARGV or usage();
 
