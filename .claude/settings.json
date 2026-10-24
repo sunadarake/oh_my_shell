@@ -1,4 +1,5 @@
 {
+   "includeCoAuthoredBy" : false,
    "permissions" : {
       "deny" : [
          "Bash(rm -rf:*)",
@@ -50,8 +51,7 @@
       ]
    },
    "attribution" : {
-      "pr" : "",
-      "commit" : ""
-   },
-   "includeCoAuthoredBy" : false
+      "commit" : "",
+      "pr" : ""
+   }
 }

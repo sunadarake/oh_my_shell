@@ -1,6 +1,6 @@
 ---
 description: todo/ のTODOファイルに沿って実装する
-argument-hint: [TODO番号（省略時は最新）]
+argument-hint: [TODO番号 | TODOファイルパス（省略時は最新）]
 allowed-tools: Bash(ls:*), Bash(tail:*), Read, Glob, Grep, Edit, Write, AskUserQuestion
 ---
 
@@ -12,6 +12,7 @@ $ARGUMENTS
 
 ## 手順
 1. 対象のTODOファイルを決める
+   - ファイルパス（例: `todo/077-todo.md`）が指定されていれば、そのファイル
    - 番号が指定されていれば `todo/NNN-todo.md`（3桁ゼロ埋め。例: 3 → 003）
    - 指定がなければ、上記一覧の最大番号のファイル
 2. TODOファイルを読み、計画・決定事項・懸念点を把握する
