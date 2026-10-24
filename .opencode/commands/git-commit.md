@@ -15,8 +15,9 @@ description: ここまでの変更をgit commitする
 
 ## コミットメッセージ
 - 日本語で簡潔かつ分かりやすく書く
-- 1行目は変更内容が一目で分かる50文字程度にする
-- 必要な場合のみ、空行のあとに補足を書く
+- 1行目は50文字以内、prefix として feat/fix/refactor/docs/test/chore のいずれか
+- 2行目は空行
+- 3行目以降に「なぜ」を1〜3行で書く
 - `Co-Authored-By: Claude ...` や `🤖 Generated with Claude Code` などの署名・クレジット行は含めない
 
 ## 注意
