@@ -1,108 +1,51 @@
 # oh_my_shell
 
-bash / Perl (Linux・Mac) と PowerShell (Windows) のユーティリティコマンド集
+## 目的
 
-## ビルド方法
+日常で使う小さなコマンドを、bash / Perl (Linux・Mac) と PowerShell (Windows) でまとめた便利スクリプト集。
+各スクリプトは独立しており、ビルドして PATH に通すだけで使える。
 
-### Linux / macOS
-
-```bash
-./build_unix.sh
-```
-
-PATHに追加：
+## セットアップ
 
 ```bash
-# ~/.bashrc または ~/.zshrc に追加
+# Linux / macOS
+./build_unix.sh   # unix/ のスクリプトを .bin/ へコピー
+
+# ~/.bashrc に追加
 export PATH="$HOME/Documents/oh_my_shell/.bin:$PATH"
+source "$HOME/Documents/oh_my_shell/unix/shell/functions.sh"  # mkcd / cd N / cdd など
 ```
 
-`mkcd` / `cd N` はシェル関数のため、`~/.bashrc` に source を追加：
+```powershell
+# Windows
+.\build_win.ps1   # windows\ のスクリプトを .bin_win\ へコピー
+
+# PowerShell プロファイルに追加
+$env:PATH = "C:\path\to\oh_my_shell\.bin_win;$env:PATH"
+. "C:\path\to\oh_my_shell\windows\shell\functions.ps1"  # mkcd / cd N / cdd など
+```
+
+## 使い方
+
+各コマンドの詳細は `-h` / `--help` を参照。
 
 ```bash
-source "$HOME/Documents/oh_my_shell/unix/shell/functions.sh"
+tt .claude/settings.json src/main.js  # ファイルを親ディレクトリごと作成
+ggc "メッセージ"                      # git add . と git commit (省略時は日時と変更ファイル一覧)
+ggp                                   # git push origin main
+init_claude                           # AGENTS.md / .claude/settings.json / .claude/skills/ の雛形を作成
+oo /path/to/open                      # ファイルマネージャーで開く
 ```
+
+`init_claude` は旧版の `.claude/commands/` を削除しない。同名の skill と重複するので手動で削除すること。
+
+シェル関数 (`functions.sh` / `functions.ps1`):
 
 - `mkcd <dir>` : ディレクトリを作成して移動
-- `cd 2` : `cd ../..` と同じ（同名ディレクトリがあればそちらを優先）
+- `cd 2` : `cd ../..` と同じ
 - `cdd` / `cdp` / `cdv` / `cdl` : Documents / Pictures / Videos / Downloads へ移動
 
-### Windows
-
-```powershell
-.\build_win.ps1
-```
-
-PATHに追加（PowerShellプロファイルに追加）：
-
-```powershell
-$env:PATH = "C:\path\to\oh_my_shell\.bin_win;$env:PATH"
-```
-
-`mkcd` / `cd N` はシェル関数のため、PowerShellプロファイルに dot-source を追加：
-
-```powershell
-. "C:\path\to\oh_my_shell\windows\shell\functions.ps1"
-```
-
-## コマンド一覧
-
-### tt - ディレクトリ付きファイル作成
-
-ファイルとその親ディレクトリを一度に作成します。
-
-```bash
-# ファイル作成（親ディレクトリも自動作成）
-tt .claude/settings.json src/main.js
-
-# ディレクトリ作成
-tt bin/oreore/
-```
-
-### oo - エクスプローラー(ファイルマネージャー)を開く(OSに適した形で)
-
-```bash
-oo /path/to/open
-```
-
-### ggc - Gitコミット
-
-`git add .` と `git commit` をまとめて実行します。
-
-```bash
-# "Update: 日時 (N files)" と変更ファイル一覧のメッセージでコミット
-ggc
-
-# カスタムメッセージでコミット
-ggc "READMEの修正" "バグ修正"
-```
-
-### ggp - Git プッシュ
-
-`git push origin main` を実行します。
-
-```bash
-# origin main にプッシュ
-ggp
-
-# カスタムオプション指定
-ggp origin feature-branch
-```
-
-
-### init_claude Claudeの雛形を作成する
-
-現在のディレクトリに AGENTS.mdや .claude/settings.json、.claude/skills/ を作成する
-
-旧版の `.claude/commands/` は削除されない。同名の skill と重複するので手動で削除すること。
-
-```bash
-init_claude
-```
-
-### その他のコマンド
-
-詳細は各コマンドの `-h` / `--help` を参照。
+その他のコマンド:
 
 | コマンド | 内容 |
 |---|---|
