@@ -1,6 +1,6 @@
 # oh_my_shell
 
-シェルスクリプトベースのユーティリティコマンド集
+bash / Perl (Linux・Mac) と PowerShell (Windows) のユーティリティコマンド集
 
 ## ビルド方法
 
@@ -45,8 +45,6 @@ $env:PATH = "C:\path\to\oh_my_shell\.bin_win;$env:PATH"
 . "C:\path\to\oh_my_shell\windows\shell\functions.ps1"
 ```
 
-**注意**: Windows版は `busybox64u` が必要です。
-
 ## コマンド一覧
 
 ### tt - ディレクトリ付きファイル作成
@@ -61,7 +59,7 @@ tt .claude/settings.json src/main.js
 tt bin/oreore/
 ```
 
-### oo - exploerを開く(OSに適した形で)
+### oo - エクスプローラー(ファイルマネージャー)を開く(OSに適した形で)
 
 ```bash
 oo /path/to/open
@@ -102,10 +100,24 @@ ggp origin feature-branch
 init_claude
 ```
 
-### init_python_scripts Pythonのスクリプト集プロジェクトの雛形を作成する
+### その他のコマンド
 
-`uv init --package foo-bar` をしたあとに、AGENTS.mdなどを追加したプロジェクトを作成する。
+詳細は各コマンドの `-h` / `--help` を参照。
 
-```bash
-init_python_scripts
-```
+| コマンド | 内容 |
+|---|---|
+| `ggf` | `git pull origin main` |
+| `ggr` | 変更を破棄して直前のコミットに戻す (Windows のみ) |
+| `ccc` | 標準入力 / ファイルをクリップボードへコピー |
+| `dcp` | コピー元と同じディレクトリにファイルをコピー |
+| `dd` | 画面クリア |
+| `az` | 暗算 (`az 14 a 54`) |
+| `nt` / `ntv` | `todo/` に連番ファイルを作成 / 最新を vim で開く |
+| `tre` | tree (ビルドディレクトリを自動除外) |
+| `memo` | memomemo を Zed (なければ VSCode) で開く |
+| `vv` | ファイルを別ターミナルの vim で開く |
+| `zz` | パスを Zed で開く |
+| `claude_stash` | ディレクトリを `~/.claude_stash` へ退避 / 復元 |
+| `open-webui` | Open WebUI を起動 |
+| `update-chrome` | Google Chrome を更新 |
+| `install-fonts` | フォントを `~/.local/share/fonts/` へ導入 (Unix のみ) |

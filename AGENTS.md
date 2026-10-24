@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 
-便利スクリプト集。。
+便利スクリプト集。
 
 - `unix/` : Linux/Mac向け、bash  or Perlで記述
 - `windows/` : Windows向け、PowerShell7 で記述
@@ -24,13 +24,14 @@
 - skill の雛形は `templates/init_claude/skill/<名>.md` に置く。init_claude が `name:` を補って `.claude/skills/<名>/SKILL.md` と `.opencode/skills/<名>/SKILL.md` を生成する
 - init_claude は `--update` (PowerShell は `-Update`) で settings.json / skills / opencode.json を上書きする。AGENTS.md は上書きしない
 - 機能・動作は元スクリプトと同等にすること
-- スクリプト冒頭にコメントで元ファイル名と用途を記載すること
+- スクリプト冒頭にコメントで説明を3行程度記載すること(概要1行 + 使い方の例。元ファイルがある場合は元ファイル名も)
+- すべてのスクリプトに `-h` / `--help` オプションを実装すること
 
 ### unix/ (bash)
 
-- shebang は `#!/bin/bash` を使用
+- bash スクリプトの shebang は `#!/bin/bash` を使用(`build_unix.sh` は `#!/bin/sh`)
 - 文字列処理は `sed` / `awk` / `cut` などの標準ツールを使う
-- Perlスクリプトの移植も同様に bash で実装する
+- Perl スクリプト(`.pl`)も `unix/` に置き、`build_unix.sh` が拡張子なしで `.bin/` へコピーする
 - `cd` のように親シェルへ作用する関数は `unix/shell/functions.sh` に定義し、`~/.bashrc` で source する(bash のみ対応)
 
 ### windows/ (PowerShell)
@@ -44,7 +45,7 @@
 ## 作業上の注意
 
 - 移植できない・判断が難しい箇所があれば、コメントに `TODO:` を残す
-- 元スクリプトは変更しない（読み取り専用として扱う）
+- 移植元(コメントの「元ファイル」)はこのリポジトリにない。移植時は元の動作を変えない
 
 ## プロジェクトの取り組み方について
 
