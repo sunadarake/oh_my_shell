@@ -30,6 +30,19 @@ sub fwrite {
 
 my $update = grep { $_ eq '--update' } @ARGV;
 
+if (grep { $_ eq '-h' || $_ eq '--help' } @ARGV) {
+    print <<'EOT';
+使い方: init_claude [--update] [-h|--help]
+
+Claude Code / OpenCode の設定ファイルをカレントディレクトリに作成する。
+
+  --update    settings.json / commands / opencode.json を上書きする
+              (AGENTS.md は変更しない)
+  -h, --help  このヘルプを表示する
+EOT
+    exit 0;
+}
+
 # 未作成または --update のときのみ書き込む
 sub put {
     my ($file, $content) = @_;

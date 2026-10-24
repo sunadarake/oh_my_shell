@@ -1,7 +1,20 @@
 # init_claude - Claude Code / OpenCode設定ファイルを初期化
 # 元ファイル: perl/init_claude.pl
 # 使い方: .\init_claude.ps1 [-Update]  (-Update: 設定・コマンドを上書き。AGENTS.md は変更しない)
-param([switch]$Update)
+param([switch]$Update, [Alias('h')][switch]$Help)
+
+if ($Help) {
+    @'
+使い方: init_claude [-Update] [-h|-Help]
+
+Claude Code / OpenCode の設定ファイルをカレントディレクトリに作成する。
+
+  -Update     settings.json / commands / opencode.json を上書きする
+              (AGENTS.md は変更しない)
+  -h, -Help   このヘルプを表示する
+'@
+    return
+}
 
 # 未作成または -Update のときのみ書き込む
 function Write-IfNeeded($file, $content) {
