@@ -7,7 +7,8 @@ if ($args.Count -gt 0 -and $args[0] -in '-h', '--help') {
 使い方: ggc [コミットメッセージ...] [-h|--help]
 
 git add . && git commit を実行する。
-メッセージを省略すると "update 日時" になる。複数指定すると改行区切りで結合する。
+メッセージを省略すると、1行目が "Update: 日時 (N files)"、3行目以降が
+変更ファイル一覧 (Create/Update/Delete/Rename) になる。複数指定すると改行区切りで結合する。
 
   ggc "readmeの修正" "jsの改善"
   -h, --help  このヘルプを表示する
@@ -20,11 +21,24 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
+git add .
+
 if ($args.Count -eq 0) {
-    $msg = "update " + (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+    # ステージ済みの変更から「Update: 日時 (N files)」と変更ファイル一覧を作る
+    # TODO: PowerShell 5.1 で日本語ファイル名が文字化けする場合は [Console]::OutputEncoding の設定が必要
+    $files = @(git -c core.quotepath=false diff --cached --name-status | ForEach-Object {
+        $f = $_ -split "`t"
+        switch -Regex ($f[0]) {
+            '^A' { "Create: $($f[1])" }
+            '^M' { "Update: $($f[1])" }
+            '^D' { "Delete: $($f[1])" }
+            '^R' { "Rename: $($f[1]) -> $($f[2])" }
+            default { "Update: $($f[1])" }
+        }
+    })
+    $msg = "Update: " + (Get-Date -Format "yyyy-MM-dd HH:mm:ss") + " ($($files.Count) files)`n`n" + ($files -join "`n")
 } else {
     $msg = $args -join "`n"
 }
 
-git add .
 git commit -m $msg
