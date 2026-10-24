@@ -1,6 +1,15 @@
 # init_claude - Claude Code / OpenCode設定ファイルを初期化
 # 元ファイル: perl/init_claude.pl
-# 使い方: .\init_claude.ps1
+# 使い方: .\init_claude.ps1 [-Update]  (-Update: 設定・コマンドを上書き。AGENTS.md は変更しない)
+param([switch]$Update)
+
+# 未作成または -Update のときのみ書き込む
+function Write-IfNeeded($file, $content) {
+    $exists = Test-Path $file
+    if ($exists -and -not $Update) { return }
+    Set-Content $file $content -Encoding UTF8NoBOM
+    Write-Output ("{0}: {1}" -f $(if ($exists) { 'Updated' } else { 'Created' }), $file)
+}
 
 $commands = @(
     'rg','grep','egrep','fgrep',
@@ -12,7 +21,7 @@ $commands = @(
 )
 
 $settingsFile = '.claude\settings.json'
-if (-not (Test-Path $settingsFile)) {
+if ($true) {
     New-Item -ItemType Directory -Path '.claude' -Force | Out-Null
 
     # Bash用の許可コマンド
@@ -43,8 +52,7 @@ if (-not (Test-Path $settingsFile)) {
         attribution = @{ commit = ''; pr = '' }
         includeCoAuthoredBy = $false
     }
-    $settings | ConvertTo-Json -Depth 5 | Set-Content $settingsFile -Encoding UTF8NoBOM
-    Write-Output "Created: $settingsFile"
+    Write-IfNeeded $settingsFile ($settings | ConvertTo-Json -Depth 5)
 }
 
 # .claude\commands にスラッシュコマンドを追加する
@@ -60,28 +68,20 @@ foreach ($f in Get-ChildItem "$tplDir\commands" -Filter '*.md') {
     $slashCommands[$f.Name] = Get-Content $f.FullName -Raw -Encoding UTF8
 }
 foreach ($name in $slashCommands.Keys) {
-    $file = Join-Path $commandsDir $name
-    if (-not (Test-Path $file)) {
-        Set-Content $file $slashCommands[$name] -Encoding UTF8NoBOM
-        Write-Output "Created: $file"
-    }
+    Write-IfNeeded (Join-Path $commandsDir $name) $slashCommands[$name]
 }
 
 # OpenCode: .opencode\commands に同じコマンドを追加する(argument-hint / allowed-tools は未対応のため除く)
 $ocCommandsDir = '.opencode\commands'
 New-Item -ItemType Directory -Path $ocCommandsDir -Force | Out-Null
 foreach ($name in $slashCommands.Keys) {
-    $file = Join-Path $ocCommandsDir $name
-    if (-not (Test-Path $file)) {
-        $body = $slashCommands[$name] -replace '(?m)^(argument-hint|allowed-tools):.*\r?\n', '' -replace 'CLAUDE\.md', 'AGENTS.md'
-        Set-Content $file $body -Encoding UTF8NoBOM
-        Write-Output "Created: $file"
-    }
+    $body = $slashCommands[$name] -replace '(?m)^(argument-hint|allowed-tools):.*\r?\n', '' -replace 'CLAUDE\.md', 'AGENTS.md'
+    Write-IfNeeded (Join-Path $ocCommandsDir $name) $body
 }
 
 # OpenCode: opencode.json に permission を設定する(後勝ちのため "*" を先頭に置く)
 $opencodeFile = 'opencode.json'
-if (-not (Test-Path $opencodeFile)) {
+if ($true) {
     $config = [ordered]@{
         '$schema'  = 'https://opencode.ai/config.json'
         permission = [ordered]@{
@@ -92,8 +92,7 @@ if (-not (Test-Path $opencodeFile)) {
             bash               = [ordered]@{ '*' = 'allow'; 'rm *' = 'ask'; 'rmdir *' = 'ask' }
         }
     }
-    $config | ConvertTo-Json -Depth 5 | Set-Content $opencodeFile -Encoding UTF8NoBOM
-    Write-Output "Created: $opencodeFile"
+    Write-IfNeeded $opencodeFile ($config | ConvertTo-Json -Depth 5)
 }
 
 if (-not (Test-Path 'AGENTS.md')) {

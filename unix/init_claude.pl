@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # 元ファイル: perl/init_claude.pl - Claude Code / OpenCode設定ファイルを初期化
-# 使い方: perl init_claude.pl
+# 使い方: perl init_claude.pl [--update]  (--update: 設定・コマンドを上書き。AGENTS.md は変更しない)
 
 use strict;
 use warnings;
@@ -28,6 +28,17 @@ sub fwrite {
     close($fh);
 }
 
+my $update = grep { $_ eq '--update' } @ARGV;
+
+# 未作成または --update のときのみ書き込む
+sub put {
+    my ($file, $content) = @_;
+    my $exists = -f $file;
+    return if $exists && !$update;
+    fwrite($file, $content);
+    print(($exists ? "Updated" : "Created"), ": $file\n");
+}
+
 my @commands = qw(
     rg grep egrep fgrep
     mkdir cp mv touch chmod chown find
@@ -38,9 +49,8 @@ my @commands = qw(
 );
 
 my $settings_file = '.claude/settings.json';
-# settings.json が未作成のときのみ初期化する
-unless (-f $settings_file) {
-    make_path('.claude');
+make_path('.claude');
+{
 
     my @allow = map { "Bash($_:*)" } @commands;
     push @allow, "Bash(git:*)", "List(*)", "Edit(*)", "Write(*)", "mcp__voicevox__speak";
@@ -57,8 +67,7 @@ unless (-f $settings_file) {
         attribution => { commit => '', pr => '' },
         includeCoAuthoredBy => JSON::PP::false,
     };
-    fwrite($settings_file, JSON::PP->new->utf8->pretty->encode($settings));
-    print "Created: $settings_file\n";
+    put($settings_file, JSON::PP->new->utf8->pretty->encode($settings));
 }
 
 # .claude/commands にスラッシュコマンドを追加する
@@ -69,27 +78,21 @@ my %commands = map { basename($_) => fread($_) } bsd_glob("$tpl/commands/*.md");
 make_path('.claude/commands');
 for my $name (sort keys %commands) {
     my $file = ".claude/commands/$name";
-    unless (-f $file) {
-        fwrite($file, $commands{$name});
-        print "Created: $file\n";
-    }
+    put($file, $commands{$name});
 }
 
 # OpenCode: .opencode/commands に同じコマンドを追加する(argument-hint / allowed-tools は未対応のため除く)
 make_path('.opencode/commands');
 for my $name (sort keys %commands) {
     my $file = ".opencode/commands/$name";
-    unless (-f $file) {
-        (my $body = $commands{$name}) =~ s/^(?:argument-hint|allowed-tools):.*\n//mg;
-        $body =~ s/CLAUDE\.md/AGENTS.md/g;
-        fwrite($file, $body);
-        print "Created: $file\n";
-    }
+    (my $body = $commands{$name}) =~ s/^(?:argument-hint|allowed-tools):.*\n//mg;
+    $body =~ s/CLAUDE\.md/AGENTS.md/g;
+    put($file, $body);
 }
 
 # OpenCode: opencode.json に permission を設定する(後勝ちのため "*" を先頭に置く)
 my $opencode_file = 'opencode.json';
-unless (-f $opencode_file) {
+{
     my $config = {
         '$schema'  => 'https://opencode.ai/config.json',
         permission => {
@@ -100,8 +103,7 @@ unless (-f $opencode_file) {
             bash               => { '*' => 'allow', 'rm *' => 'ask', 'rmdir *' => 'ask' },
         },
     };
-    fwrite($opencode_file, JSON::PP->new->utf8->pretty->canonical->encode($config));
-    print "Created: $opencode_file\n";
+    put($opencode_file, JSON::PP->new->utf8->pretty->canonical->encode($config));
 }
 
 # 未作成のときのみ生成する
