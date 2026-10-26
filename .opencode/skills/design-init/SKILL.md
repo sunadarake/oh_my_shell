@@ -7,7 +7,7 @@ description: 計画書からAGENTS.mdと初期のTODOファイルを作成する
 $ARGUMENTS
 
 ## 現在のファイル構成
-!`ls -A | grep -vxE 'node_modules|venv|\.venv|\.claude|\.opencode|\.git'`
+!`ls -A | grep -vxE 'node_modules|venv|\.venv|\.claude|\.opencode|\.git|todo|build|dist|out|target|\.next|__pycache__'`
 
 ## 手順
 1. 計画書を読み、目的・機能・制約を把握する。既存のコードがあれば確認する
