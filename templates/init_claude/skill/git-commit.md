@@ -18,7 +18,7 @@ allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git add:*), Bash(git c
 - 日本語で簡潔かつ分かりやすく書く
 - 1行目は50文字以内、prefix として feat/fix/refactor/docs/test/chore のいずれか
 - 2行目は空行
-- 3行目以降に「なぜ」を1〜3行で書く
+- 3行目以降は「なぜ」を `- ` で始まる箇条書きで1〜3項目書く(1項目1行)
 - `Co-Authored-By: Claude ...` や `🤖 Generated with Claude Code` などの署名・クレジット行は含めない
 
 ## 注意
