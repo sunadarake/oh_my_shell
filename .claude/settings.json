@@ -1,5 +1,8 @@
 {
-   "includeCoAuthoredBy" : false,
+   "attribution" : {
+      "commit" : "",
+      "pr" : ""
+   },
    "permissions" : {
       "allow" : [
          "Bash(rg:*)",
@@ -50,8 +53,5 @@
          "Read(./.env)"
       ]
    },
-   "attribution" : {
-      "commit" : "",
-      "pr" : ""
-   }
+   "includeCoAuthoredBy" : false
 }
