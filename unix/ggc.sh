@@ -7,8 +7,9 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
 使い方: ggc [コミットメッセージ...] [-h|--help]
 
 git add . && git commit を実行する。
-メッセージを省略すると、1行目が "Update: 日時 (N files)"、3行目以降が
-変更ファイル一覧 (Create/Update/Delete/Rename) になる。複数指定すると改行区切りで結合する。
+メッセージを省略すると、1行目が "docs|chore: 日時 (N files)"、3行目以降が
+変更ファイル一覧 (Create/Update/Delete/Rename) になる。
+変更が .md だけなら docs、それ以外は chore。複数指定すると改行区切りで結合する。
 
   ggc "readmeの修正" "jsの改善"
   -h, --help  このヘルプを表示する
@@ -24,7 +25,7 @@ fi
 git add . || exit
 
 if [ $# -eq 0 ]; then
-    # ステージ済みの変更から「Update: 日時 (N files)」と変更ファイル一覧を作る
+    # ステージ済みの変更から「種類: 日時 (N files)」と変更ファイル一覧を作る
     files=$(git -c core.quotepath=false diff --cached --name-status | awk -F'\t' '
         $1 == "A" { print "Create: " $2 }
         $1 == "M" { print "Update: " $2 }
@@ -32,7 +33,12 @@ if [ $# -eq 0 ]; then
         $1 ~ /^R/ { print "Rename: " $2 " -> " $3 }
         $1 !~ /^[AMDR]/ { print "Update: " $2 }')
     count=$(printf "%s\n" "$files" | grep -c .)
-    msg=$(printf "Update: %s (%s files)\n\n%s" "$(date '+%Y-%m-%d %H:%M:%S')" "$count" "$files")
+    # .md 以外が1つでもあれば chore、.md だけなら docs
+    kind=docs
+    if [ "$count" -eq 0 ] || git -c core.quotepath=false diff --cached --name-only | grep -qvi '\.md$'; then
+        kind=chore
+    fi
+    msg=$(printf "%s: %s (%s files)\n\n%s" "$kind" "$(date '+%Y-%m-%d %H:%M:%S')" "$count" "$files")
 else
     # 複数引数を改行区切りで結合してコミットメッセージにする
     msg=$(printf "%s\n" "$@")
