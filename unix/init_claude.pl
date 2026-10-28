@@ -78,7 +78,7 @@ my $settings = {
     attribution => { commit => '', pr => '' },
     includeCoAuthoredBy => JSON::PP::false,
 };
-put($settings_file, JSON::PP->new->utf8->pretty->encode($settings));
+put($settings_file, JSON::PP->new->utf8->pretty->canonical->encode($settings));
 
 # .claude/skills/<名>/SKILL.md に skill を追加する
 # テンプレートを読み込む(build後は .bin/templates、開発時は ../templates)

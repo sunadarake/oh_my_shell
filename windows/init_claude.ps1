@@ -51,8 +51,11 @@ $psAllow = @($psAllow) + $(foreach ($cmd in $psNativeCommands) { "PowerShell(${c
 
 $allow = @($bashAllow) + @($psAllow) + @('Bash(git:*)', 'PowerShell(git:*)', 'List(*)', 'Edit(*)', 'Write(*)', 'mcp__voicevox__speak')
 
-$settings = @{
-    permissions = @{
+$settings = [ordered]@{
+    # 署名(Co-Authored-By等)をコミット・PRに付けない
+    attribution = [ordered]@{ commit = ''; pr = '' }
+    includeCoAuthoredBy = $false
+    permissions = [ordered]@{
         allow = $allow
         # 危険な操作と機密ファイルの読み取りを拒否する
         deny  = @(
@@ -60,9 +63,6 @@ $settings = @{
             'Read(~/.ssh/**)', 'Read(./.env)'
         )
     }
-    # 署名(Co-Authored-By等)をコミット・PRに付けない
-    attribution = @{ commit = ''; pr = '' }
-    includeCoAuthoredBy = $false
 }
 Write-IfNeeded $settingsFile ($settings | ConvertTo-Json -Depth 5)
 

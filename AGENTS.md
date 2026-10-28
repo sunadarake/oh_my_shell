@@ -23,6 +23,7 @@
 - 各スクリプトは独立している（相互依存なし）。ただし init_claude は `templates/` を読み込む（build で `.bin*/templates` にコピーされる）
 - skill の雛形は `templates/init_claude/skill/<名>.md` に置く。init_claude が `name:` を補って `.claude/skills/<名>/SKILL.md` と `.opencode/skills/<名>/SKILL.md` を生成する
 - init_claude は `--update` (PowerShell は `-Update`) で settings.json / skills / opencode.json を上書きする。AGENTS.md は上書きしない
+- init_claude が出す JSON はキー順を固定する (Perl は `->canonical`、PowerShell は `[ordered]`)
 - 機能・動作は元スクリプトと同等にすること
 - スクリプト冒頭にコメントで説明を3行程度記載すること(概要1行 + 使い方の例。元ファイルがある場合は元ファイル名も)
 - すべてのスクリプトに `-h` / `--help` オプションを実装すること
