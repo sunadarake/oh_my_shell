@@ -31,6 +31,7 @@
 ### unix/ (bash)
 
 - bash スクリプトの shebang は `#!/bin/bash` を使用(`build_unix.sh` は `#!/bin/sh`)
+- 処理は `main()` にまとめ、ファイル末尾の `main "$@"` から実行する
 - 文字列処理は `sed` / `awk` / `cut` などの標準ツールを使う
 - Perl スクリプト(`.pl`)も `unix/` に置き、`build_unix.sh` が拡張子なしで `.bin/` へコピーする
 - Perl スクリプトは `sub main` に処理をまとめ、ファイル末尾の `main();` から実行する
