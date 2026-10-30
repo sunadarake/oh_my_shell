@@ -7,8 +7,9 @@ use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 
-if (@ARGV && ($ARGV[0] eq '-h' || $ARGV[0] eq '--help')) {
-    print <<'EOT';
+sub main {
+    if (@ARGV && ($ARGV[0] eq '-h' || $ARGV[0] eq '--help')) {
+        print <<'EOT';
 使い方: az <数> <演算子> <数> [-h|--help]
 
 CLI 上で暗算をする。演算子は英字で指定する (a=+ s=- m=* d=/)。
@@ -17,17 +18,20 @@ CLI 上で暗算をする。演算子は英字で指定する (a=+ s=- m=* d=/)�
   az 91 m 32
   -h, --help  このヘルプを表示する
 EOT
-    exit 0;
+        exit 0;
+    }
+
+    my $expr = join(' ', @ARGV);
+    # 英字演算子を記号に置換: a=+ s=- m=* d=/
+    $expr =~ s/\ba\b/+/g;
+    $expr =~ s/\bs\b/-/g;
+    $expr =~ s/\bm\b/*/g;
+    $expr =~ s/\bd\b/\//g;
+
+    # 式を評価して計算
+    my $result = eval $expr;
+    die "エラー: $@" if $@;
+    print "$result\n";
 }
 
-my $expr = join(' ', @ARGV);
-# 英字演算子を記号に置換: a=+ s=- m=* d=/
-$expr =~ s/\ba\b/+/g;
-$expr =~ s/\bs\b/-/g;
-$expr =~ s/\bm\b/*/g;
-$expr =~ s/\bd\b/\//g;
-
-# 式を評価して計算
-my $result = eval $expr;
-die "エラー: $@" if $@;
-print "$result\n";
+main();

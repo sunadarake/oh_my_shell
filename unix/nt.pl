@@ -7,17 +7,6 @@ use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 
-if (@ARGV && ($ARGV[0] eq '-h' || $ARGV[0] eq '--help')) {
-    print <<'EOT';
-使い方: nt [ファイル名 [枚数]] | nt [枚数] [-h|--help]
-
-todo ディレクトリに連番の todo ファイル (000-todo.md) を作成する。
-ファイル名を指定すると、カレントディレクトリに連番付きの空ファイルを作成する (枚数の既定は 3)。
-
-  -h, --help  このヘルプを表示する
-EOT
-    exit 0;
-}
 use Cwd qw(cwd);
 use File::Basename qw(basename);
 use File::Find qw(find);
@@ -37,61 +26,77 @@ sub find_files {
     return @files;
 }
 
-my ($base_file, $count);
+sub main {
+    if (@ARGV && ($ARGV[0] eq '-h' || $ARGV[0] eq '--help')) {
+        print <<'EOT';
+使い方: nt [ファイル名 [枚数]] | nt [枚数] [-h|--help]
 
-# 第1引数が数字でなければファイル名モード、数字なら枚数モード
-if (@ARGV >= 1 && $ARGV[0] !~ /^\d+$/) {
-    $base_file = shift @ARGV;
-    $count = 3;
-    if (@ARGV == 1) {
-        die "エラー: 正の整数を指定してください。\n" if $ARGV[0] !~ /^\d+$/ || $ARGV[0] == 0;
-        $count = int($ARGV[0]);
-    } elsif (@ARGV > 1) {
-        die "Usage: nt [ファイル名 [枚数]]\n";
+todo ディレクトリに連番の todo ファイル (000-todo.md) を作成する。
+ファイル名を指定すると、カレントディレクトリに連番付きの空ファイルを作成する (枚数の既定は 3)。
+
+  -h, --help  このヘルプを表示する
+EOT
+        exit 0;
     }
-} else {
-    $count = 1;
-    if (@ARGV == 1) {
-        die "エラー: 正の整数を指定してください。\n" if $ARGV[0] !~ /^\d+$/ || $ARGV[0] == 0;
-        $count = int($ARGV[0]);
-    } elsif (@ARGV > 1) {
-        die "Usage: nt [枚数]\n";
+
+    my ($base_file, $count);
+
+    # 第1引数が数字でなければファイル名モード、数字なら枚数モード
+    if (@ARGV >= 1 && $ARGV[0] !~ /^\d+$/) {
+        $base_file = shift @ARGV;
+        $count = 3;
+        if (@ARGV == 1) {
+            die "エラー: 正の整数を指定してください。\n" if $ARGV[0] !~ /^\d+$/ || $ARGV[0] == 0;
+            $count = int($ARGV[0]);
+        } elsif (@ARGV > 1) {
+            die "Usage: nt [ファイル名 [枚数]]\n";
+        }
+    } else {
+        $count = 1;
+        if (@ARGV == 1) {
+            die "エラー: 正の整数を指定してください。\n" if $ARGV[0] !~ /^\d+$/ || $ARGV[0] == 0;
+            $count = int($ARGV[0]);
+        } elsif (@ARGV > 1) {
+            die "Usage: nt [枚数]\n";
+        }
+    }
+
+    if (defined $base_file) {
+        # ファイル名を stem と拡張子に分割して連番を挿入
+        my ($stem, $ext) = $base_file =~ /^(.*?)(\.[^.\/]+)?$/;
+        $ext //= '';
+        for my $i (1 .. $count) {
+            my $filename = sprintf('%s-%03d%s', $stem, $i, $ext);
+            fwrite($filename, "");
+            print "Created: $filename\n";
+        }
+    } else {
+        my $pwd = cwd();
+        my $todo_dir;
+        if (basename($pwd) eq 'todo') {
+            $todo_dir = $pwd;
+        } elsif (-d "$pwd/todo") {
+            $todo_dir = "$pwd/todo";
+        }
+        unless ($todo_dir) {
+            die "エラー: todoディレクトリが見つかりません。\n" .
+                "カレントディレクトリが todo、または１つ上に todo ディレクトリが必要です。\n";
+        }
+
+        my @existing = find_files($todo_dir);
+        my $next = 1;
+        if (@existing) {
+            # 既存ファイルの連番を数値ソートして最大値の次を使う
+            my @nums = sort { $a <=> $b } map { /(\d{3})-todo\.md$/; $1 + 0 } @existing;
+            $next = $nums[-1] + 1;
+        }
+
+        for my $i (0 .. $count - 1) {
+            my $filename = sprintf('%s/%03d-todo.md', $todo_dir, $next + $i);
+            fwrite($filename, "");
+            print "Created: $filename\n";
+        }
     }
 }
 
-if (defined $base_file) {
-    # ファイル名を stem と拡張子に分割して連番を挿入
-    my ($stem, $ext) = $base_file =~ /^(.*?)(\.[^.\/]+)?$/;
-    $ext //= '';
-    for my $i (1 .. $count) {
-        my $filename = sprintf('%s-%03d%s', $stem, $i, $ext);
-        fwrite($filename, "");
-        print "Created: $filename\n";
-    }
-} else {
-    my $pwd = cwd();
-    my $todo_dir;
-    if (basename($pwd) eq 'todo') {
-        $todo_dir = $pwd;
-    } elsif (-d "$pwd/todo") {
-        $todo_dir = "$pwd/todo";
-    }
-    unless ($todo_dir) {
-        die "エラー: todoディレクトリが見つかりません。\n" .
-            "カレントディレクトリが todo、または１つ上に todo ディレクトリが必要です。\n";
-    }
-
-    my @existing = find_files($todo_dir);
-    my $next = 1;
-    if (@existing) {
-        # 既存ファイルの連番を数値ソートして最大値の次を使う
-        my @nums = sort { $a <=> $b } map { /(\d{3})-todo\.md$/; $1 + 0 } @existing;
-        $next = $nums[-1] + 1;
-    }
-
-    for my $i (0 .. $count - 1) {
-        my $filename = sprintf('%s/%03d-todo.md', $todo_dir, $next + $i);
-        fwrite($filename, "");
-        print "Created: $filename\n";
-    }
-}
+main();

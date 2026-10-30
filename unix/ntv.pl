@@ -7,17 +7,6 @@ use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 
-if (@ARGV && ($ARGV[0] eq '-h' || $ARGV[0] eq '--help')) {
-    print <<'EOT';
-使い方: ntv [-h|--help]
-
-todo ディレクトリの最新の todo ファイルを vim で開く。
-最新のファイルが空ならそれを開き、空でなければ次の連番を作成して開く。
-
-  -h, --help  このヘルプを表示する
-EOT
-    exit 0;
-}
 use Cwd qw(cwd);
 use File::Basename qw(basename);
 use File::Find qw(find);
@@ -45,50 +34,66 @@ sub find_files {
     return @files;
 }
 
-# vimのパスを探す
-my $vim_path;
-for my $dir (split /:/, ($ENV{PATH} // '')) {
-    if (-x "$dir/vim") { $vim_path = "$dir/vim"; last; }
-}
-die "エラー: vim が見つかりません。vim がインストールされていることを確認してください。\n"
-    unless $vim_path;
+sub main {
+    if (@ARGV && ($ARGV[0] eq '-h' || $ARGV[0] eq '--help')) {
+        print <<'EOT';
+使い方: ntv [-h|--help]
 
-my $pwd = cwd();
-my $todo_dir;
-if (basename($pwd) eq 'todo') {
-    $todo_dir = $pwd;
-} elsif (-d "$pwd/todo") {
-    $todo_dir = "$pwd/todo";
-}
-die "エラー: todoディレクトリが見つかりません。\n" .
-    "カレントディレクトリが todo、または1つ上に todo ディレクトリが必要です。\n"
-    unless $todo_dir;
+todo ディレクトリの最新の todo ファイルを vim で開く。
+最新のファイルが空ならそれを開き、空でなければ次の連番を作成して開く。
 
-# ファイル名の連番で昇順ソート
-my @sorted = sort {
-    my ($na) = $a =~ /(\d{3})-todo\.md$/;
-    my ($nb) = $b =~ /(\d{3})-todo\.md$/;
-    $na <=> $nb;
-} find_files($todo_dir);
+  -h, --help  このヘルプを表示する
+EOT
+        exit 0;
+    }
 
-my $target_file;
-if (@sorted) {
-    my $latest = $sorted[-1];
-    # \S: 空白以外の文字がなければ空ファイルと判定
-    if (fread($latest) !~ /\S/) {
-        $target_file = $latest;
-        print "Updated: $latest\n";
+    # vimのパスを探す
+    my $vim_path;
+    for my $dir (split /:/, ($ENV{PATH} // '')) {
+        if (-x "$dir/vim") { $vim_path = "$dir/vim"; last; }
+    }
+    die "エラー: vim が見つかりません。vim がインストールされていることを確認してください。\n"
+        unless $vim_path;
+
+    my $pwd = cwd();
+    my $todo_dir;
+    if (basename($pwd) eq 'todo') {
+        $todo_dir = $pwd;
+    } elsif (-d "$pwd/todo") {
+        $todo_dir = "$pwd/todo";
+    }
+    die "エラー: todoディレクトリが見つかりません。\n" .
+        "カレントディレクトリが todo、または1つ上に todo ディレクトリが必要です。\n"
+        unless $todo_dir;
+
+    # ファイル名の連番で昇順ソート
+    my @sorted = sort {
+        my ($na) = $a =~ /(\d{3})-todo\.md$/;
+        my ($nb) = $b =~ /(\d{3})-todo\.md$/;
+        $na <=> $nb;
+    } find_files($todo_dir);
+
+    my $target_file;
+    if (@sorted) {
+        my $latest = $sorted[-1];
+        # \S: 空白以外の文字がなければ空ファイルと判定
+        if (fread($latest) !~ /\S/) {
+            $target_file = $latest;
+            print "Updated: $latest\n";
+        } else {
+            my ($num) = $latest =~ /(\d{3})-todo\.md$/;
+            $target_file = sprintf("%s/%03d-todo.md", $todo_dir, $num + 1);
+            fwrite($target_file, "");
+            print "Created: $target_file\n";
+        }
     } else {
-        my ($num) = $latest =~ /(\d{3})-todo\.md$/;
-        $target_file = sprintf("%s/%03d-todo.md", $todo_dir, $num + 1);
+        $target_file = "$todo_dir/001-todo.md";
         fwrite($target_file, "");
         print "Created: $target_file\n";
     }
-} else {
-    $target_file = "$todo_dir/001-todo.md";
-    fwrite($target_file, "");
-    print "Created: $target_file\n";
+
+    print "Open by Vim: $target_file\n";
+    exec($vim_path, $target_file);  # 現在のプロセスをvimに置き換える
 }
 
-print "Open by Vim: $target_file\n";
-exec($vim_path, $target_file);  # 現在のプロセスをvimに置き換える
+main();

@@ -28,20 +28,7 @@ sub fwrite {
     close($fh);
 }
 
-my $update = grep { $_ eq '--update' } @ARGV;
-
-if (grep { $_ eq '-h' || $_ eq '--help' } @ARGV) {
-    print <<'EOT';
-使い方: init_claude [--update] [-h|--help]
-
-Claude Code / OpenCode の設定ファイルをカレントディレクトリに作成する。
-
-  --update    settings.json / skills / opencode.json を上書きする
-              (AGENTS.md は変更しない)
-  -h, --help  このヘルプを表示する
-EOT
-    exit 0;
-}
+my $update;
 
 # 未作成または --update のときのみ書き込む
 sub put {
@@ -52,76 +39,95 @@ sub put {
     print(($exists ? "Updated" : "Created"), ": $file\n");
 }
 
-my @commands = qw(
-    rg grep egrep fgrep
-    mkdir cp mv touch chmod chown find
-    cat head tail less more wc sort uniq cut awk sed tee
-    ls stat file diff du df
-    which whereis pwd
-    echo curl base64
-);
+sub main {
+    $update = grep { $_ eq '--update' } @ARGV;
 
-my $settings_file = '.claude/settings.json';
-make_path('.claude');
-my @allow = map { "Bash($_:*)" } @commands;
-push @allow, "Bash(git:*)", "List(*)", "Edit(*)", "Write(*)", "mcp__voicevox__speak";
+    if (grep { $_ eq '-h' || $_ eq '--help' } @ARGV) {
+        print <<'EOT';
+使い方: init_claude [--update] [-h|--help]
 
-# 危険な操作と機密ファイルの読み取りを拒否する
-my @deny = (
-    "Bash(rm -rf:*)", "Bash(git push --force:*)",
-    "Read(~/.ssh/**)", "Read(./.env)",
-);
+Claude Code / OpenCode の設定ファイルをカレントディレクトリに作成する。
 
-# 署名(Co-Authored-By等)をコミット・PRに付けない
-my $settings = {
-    permissions => { allow => \@allow, deny => \@deny },
-    attribution => { commit => '', pr => '' },
-    includeCoAuthoredBy => JSON::PP::false,
-};
-put($settings_file, JSON::PP->new->utf8->pretty->canonical->encode($settings));
+  --update    settings.json / skills / opencode.json を上書きする
+              (AGENTS.md は変更しない)
+  -h, --help  このヘルプを表示する
+EOT
+        exit 0;
+    }
 
-# .claude/skills/<名>/SKILL.md に skill を追加する
-# テンプレートを読み込む(build後は .bin/templates、開発時は ../templates)
-my ($tpl) = grep { -d } ("$Bin/templates/init_claude", "$Bin/../templates/init_claude");
-die "テンプレートが見つかりません\n" unless $tpl;
-# frontmatter 先頭に name: を差し込む
-my %skills = map {
-    my $name = basename($_, '.md');
-    (my $body = fread($_)) =~ s/\A---\n/---\nname: $name\n/;
-    ($name => $body);
-} bsd_glob("$tpl/skill/*.md");
-for my $name (sort keys %skills) {
-    make_path(".claude/skills/$name");
-    put(".claude/skills/$name/SKILL.md", $skills{$name});
+    my @commands = qw(
+        rg grep egrep fgrep
+        mkdir cp mv touch chmod chown find
+        cat head tail less more wc sort uniq cut awk sed tee
+        ls stat file diff du df
+        which whereis pwd
+        echo curl base64
+    );
+
+    my $settings_file = '.claude/settings.json';
+    make_path('.claude');
+    my @allow = map { "Bash($_:*)" } @commands;
+    push @allow, "Bash(git:*)", "List(*)", "Edit(*)", "Write(*)", "mcp__voicevox__speak";
+
+    # 危険な操作と機密ファイルの読み取りを拒否する
+    my @deny = (
+        "Bash(rm -rf:*)", "Bash(git push --force:*)",
+        "Read(~/.ssh/**)", "Read(./.env)",
+    );
+
+    # 署名(Co-Authored-By等)をコミット・PRに付けない
+    my $settings = {
+        permissions => { allow => \@allow, deny => \@deny },
+        attribution => { commit => '', pr => '' },
+        includeCoAuthoredBy => JSON::PP::false,
+    };
+    put($settings_file, JSON::PP->new->utf8->pretty->canonical->encode($settings));
+
+    # .claude/skills/<名>/SKILL.md に skill を追加する
+    # テンプレートを読み込む(build後は .bin/templates、開発時は ../templates)
+    my ($tpl) = grep { -d } ("$Bin/templates/init_claude", "$Bin/../templates/init_claude");
+    die "テンプレートが見つかりません\n" unless $tpl;
+    # frontmatter 先頭に name: を差し込む
+    my %skills = map {
+        my $name = basename($_, '.md');
+        (my $body = fread($_)) =~ s/\A---\n/---\nname: $name\n/;
+        ($name => $body);
+    } bsd_glob("$tpl/skill/*.md");
+    for my $name (sort keys %skills) {
+        make_path(".claude/skills/$name");
+        put(".claude/skills/$name/SKILL.md", $skills{$name});
+    }
+
+    # OpenCode: .opencode/skills に同じ skill を追加する(argument-hint / allowed-tools は未対応のため除く)
+    # TODO: OpenCode の skill で $ARGUMENTS が展開されるか未確認
+    for my $name (sort keys %skills) {
+        make_path(".opencode/skills/$name");
+        (my $body = $skills{$name}) =~ s/^(?:argument-hint|allowed-tools):.*\n//mg;
+        $body =~ s/CLAUDE\.md/AGENTS.md/g;
+        put(".opencode/skills/$name/SKILL.md", $body);
+    }
+
+    # OpenCode: opencode.json に permission を設定する(後勝ちのため "*" を先頭に置く)
+    my $opencode_file = 'opencode.json';
+    my $config = {
+        '$schema'  => 'https://opencode.ai/config.json',
+        permission => {
+            '*'                => 'allow',
+            edit               => 'allow',
+            webfetch           => 'allow',
+            external_directory => 'ask',
+            bash               => { '*' => 'allow', 'rm *' => 'ask', 'rmdir *' => 'ask' },
+        },
+    };
+    put($opencode_file, JSON::PP->new->utf8->pretty->canonical->encode($config));
+
+    # 未作成のときのみ生成する
+    unless (-f 'AGENTS.md') {
+        fwrite('AGENTS.md', fread("$tpl/AGENTS.md"));
+        print "Created: AGENTS.md\n";
+    }
+
+    print "Finish Complete\n";
 }
 
-# OpenCode: .opencode/skills に同じ skill を追加する(argument-hint / allowed-tools は未対応のため除く)
-# TODO: OpenCode の skill で $ARGUMENTS が展開されるか未確認
-for my $name (sort keys %skills) {
-    make_path(".opencode/skills/$name");
-    (my $body = $skills{$name}) =~ s/^(?:argument-hint|allowed-tools):.*\n//mg;
-    $body =~ s/CLAUDE\.md/AGENTS.md/g;
-    put(".opencode/skills/$name/SKILL.md", $body);
-}
-
-# OpenCode: opencode.json に permission を設定する(後勝ちのため "*" を先頭に置く)
-my $opencode_file = 'opencode.json';
-my $config = {
-    '$schema'  => 'https://opencode.ai/config.json',
-    permission => {
-        '*'                => 'allow',
-        edit               => 'allow',
-        webfetch           => 'allow',
-        external_directory => 'ask',
-        bash               => { '*' => 'allow', 'rm *' => 'ask', 'rmdir *' => 'ask' },
-    },
-};
-put($opencode_file, JSON::PP->new->utf8->pretty->canonical->encode($config));
-
-# 未作成のときのみ生成する
-unless (-f 'AGENTS.md') {
-    fwrite('AGENTS.md', fread("$tpl/AGENTS.md"));
-    print "Created: AGENTS.md\n";
-}
-
-print "Finish Complete\n";
+main();

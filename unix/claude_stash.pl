@@ -10,10 +10,6 @@ use Cwd qw(abs_path getcwd);
 # 標準出力・標準エラーをUTF-8として扱う（Wide character警告対策）
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDERR, ':encoding(UTF-8)';
-
-# コマンドライン引数（バイト列）をUTF-8としてデコード
-@ARGV = map { decode('UTF-8', $_) } @ARGV;
-
 # ファイルシステム呼び出し用の変換ヘルパー
 sub to_fs   { encode('UTF-8', $_[0]) }  # Perl文字列 -> OSに渡すバイト列
 sub from_fs { decode('UTF-8', $_[0]) }  # OSから受け取ったバイト列 -> Perl文字列
@@ -41,19 +37,24 @@ USAGE
     exit($_[0] // 1);
 }
 
-usage(0) if @ARGV && ($ARGV[0] eq '-h' || $ARGV[0] eq '--help');
+sub main {
+    # コマンドライン引数（バイト列）をUTF-8としてデコード
+    @ARGV = map { decode('UTF-8', $_) } @ARGV;
 
-my $cmd = shift @ARGV or usage();
+    usage(0) if @ARGV && ($ARGV[0] eq '-h' || $ARGV[0] eq '--help');
 
-if ($cmd eq 'stash') {
-    usage() unless @ARGV;
-    do_stash(@ARGV);
-} elsif ($cmd eq 'restore') {
-    do_restore(@ARGV);
-} elsif ($cmd eq 'list') {
-    do_list();
-} else {
-    usage();
+    my $cmd = shift @ARGV or usage();
+
+    if ($cmd eq 'stash') {
+        usage() unless @ARGV;
+        do_stash(@ARGV);
+    } elsif ($cmd eq 'restore') {
+        do_restore(@ARGV);
+    } elsif ($cmd eq 'list') {
+        do_list();
+    } else {
+        usage();
+    }
 }
 
 sub read_manifest {
@@ -182,3 +183,4 @@ sub do_list {
     }
 }
 
+main();
