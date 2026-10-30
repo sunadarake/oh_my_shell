@@ -7,32 +7,6 @@ param(
     [Alias('h')][switch]$Help
 )
 
-if ($Help -or $Path -eq '--help') {
-    @'
-使い方: tre [-I パターン[,パターン...]] [パス] [-h|--help]
-
-ビルドディレクトリなどを除外してディレクトリツリーを表示する。
-
-  -I パターン  除外パターンを追加する (複数指定可)
-  -h, --help   このヘルプを表示する
-'@
-    return
-}
-
-$ignore = @(
-    'node_modules', '.dart_tool', '.flutter-plugins', '.flutter-plugins-dependencies',
-    '__pycache__', '.venv', 'venv', 'env', '*.egg-info', '.pytest_cache',
-    'vendor',
-    'blib', '.build', 'local',
-    'build', 'dist', 'out', 'target', 'cmake-build-*',
-    '.next', '.nuxt', '.cache',
-    '.gradle', 'Pods', 'DerivedData',
-    '.git',
-    '.vscode', '.claude', '.zed',
-    'android', 'linux', 'ios', 'win', 'web',
-    'todo'
-) + $I
-
 function Show-Tree {
     param([string]$Dir, [string]$Prefix, [string[]]$Ignore, [string]$Root)
     $items = Get-ChildItem -LiteralPath $Dir -Force -ErrorAction SilentlyContinue |
@@ -53,6 +27,36 @@ function Show-Tree {
     }
 }
 
-$root = (Resolve-Path $Path).Path
-Write-Host $root -ForegroundColor Cyan
-Show-Tree -Dir $root -Prefix "" -Ignore $ignore -Root $root
+function Main {
+    if ($Help -or $Path -eq '--help') {
+        @'
+使い方: tre [-I パターン[,パターン...]] [パス] [-h|--help]
+
+ビルドディレクトリなどを除外してディレクトリツリーを表示する。
+
+  -I パターン  除外パターンを追加する (複数指定可)
+  -h, --help   このヘルプを表示する
+'@
+        return
+    }
+
+    $ignore = @(
+        'node_modules', '.dart_tool', '.flutter-plugins', '.flutter-plugins-dependencies',
+        '__pycache__', '.venv', 'venv', 'env', '*.egg-info', '.pytest_cache',
+        'vendor',
+        'blib', '.build', 'local',
+        'build', 'dist', 'out', 'target', 'cmake-build-*',
+        '.next', '.nuxt', '.cache',
+        '.gradle', 'Pods', 'DerivedData',
+        '.git',
+        '.vscode', '.claude', '.zed',
+        'android', 'linux', 'ios', 'win', 'web',
+        'todo'
+    ) + $I
+
+    $root = (Resolve-Path $Path).Path
+    Write-Host $root -ForegroundColor Cyan
+    Show-Tree -Dir $root -Prefix "" -Ignore $ignore -Root $root
+}
+
+Main

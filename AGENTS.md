@@ -43,6 +43,7 @@
 - PowerShell 5.1 および 7.x 両対応を意識する
 - Unix系コマンド（`grep`, `awk` 等）は使わず、PowerShell ネイティブのコマンドレットで実装する
 - 文字コードは UTF-8 (BOM なし) を基本とする
+- 関数が複数あるスクリプト (`claude_stash` / `init_claude` / `tre`) は `function Main` に処理をまとめ、末尾の `Main` から実行する (短いスクリプトは不要)
 - `cd` のように親シェルへ作用する関数は `windows/shell/functions.ps1` に定義し、`$PROFILE` で dot-source する
 
 ## 作業上の注意

@@ -167,15 +167,18 @@ function Show-List {
     }
 }
 
-if ($Help -or $Command -eq '--help') { Show-Usage -Code 0 }
+function Main {
+    if ($Help -or $Command -eq '--help') { Show-Usage -Code 0 }
 
-switch ($Command) {
-    'stash' {
-        if (-not $Paths -or $Paths.Count -eq 0) { Show-Usage }
-        Invoke-Stash -Dirs $Paths
+    switch ($Command) {
+        'stash' {
+            if (-not $Paths -or $Paths.Count -eq 0) { Show-Usage }
+            Invoke-Stash -Dirs $Paths
+        }
+        'restore' { Invoke-Restore -Targets $Paths }
+        'list'    { Show-List }
+        default   { Show-Usage }
     }
-    'restore' { Invoke-Restore -Targets $Paths }
-    'list'    { Show-List }
-    default   { Show-Usage }
 }
 
+Main
