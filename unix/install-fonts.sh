@@ -64,78 +64,81 @@ copy_font() {
     INSTALLED_FONTS+=("$(basename "$file")")
 }
 
-# --- 引数チェック ---
-if [[ $# -eq 0 ]]; then
-    echo "エラー: 引数がありません。" >&2
-    show_help
-    exit 1
-fi
-
-TARGETS=()
-
-for arg in "$@"; do
-    case "$arg" in
-        -h|--help)
-            show_help
-            exit 0
-            ;;
-        -v|--version)
-            show_version
-            exit 0
-            ;;
-        *)
-            TARGETS+=("$arg")
-            ;;
-    esac
-done
-
-if [[ ${#TARGETS[@]} -eq 0 ]]; then
-    echo "エラー: フォントファイルまたはディレクトリを指定してください。" >&2
-    exit 1
-fi
-
-# --- フォントディレクトリ準備 ---
-mkdir -p "$FONT_DIR"
-
-# --- コピー処理 ---
-for target in "${TARGETS[@]}"; do
-    if [[ -f "$target" ]]; then
-        if is_font_file "$target"; then
-            copy_font "$target"
-        else
-            echo "スキップ (対象外の拡張子): $target"
-        fi
-    elif [[ -d "$target" ]]; then
-        # ディレクトリ内を再帰的に検索し、対象拡張子のみコピー
-        while IFS= read -r -d '' font_file; do
-            copy_font "$font_file"
-        done < <(find "$target" -type f \( \
-            -iname "*.ttf" -o \
-            -iname "*.otf" -o \
-            -iname "*.ttc" -o \
-            -iname "*.otc" -o \
-            -iname "*.woff" -o \
-            -iname "*.woff2" \
-        \) -print0)
-    else
-        echo "警告: 見つかりません、スキップします: $target" >&2
+main() {
+    # --- 引数チェック ---
+    if [[ $# -eq 0 ]]; then
+        echo "エラー: 引数がありません。" >&2
+        show_help
+        exit 1
     fi
-done
 
-# --- フォントキャッシュ更新 ---
-echo "フォントキャッシュを更新しています..."
-fc-cache -f -v
+    local TARGETS=()
 
-echo "完了しました。"
-
-# --- インストールしたフォント一覧を表示 ---
-if [[ ${#INSTALLED_FONTS[@]} -eq 0 ]]; then
-    echo "インストールされたフォントはありませんでした。"
-else
-    echo ""
-    echo "インストールしたフォント (${#INSTALLED_FONTS[@]} 件):"
-    for f in "${INSTALLED_FONTS[@]}"; do
-        echo "  - $f"
+    for arg in "$@"; do
+        case "$arg" in
+            -h|--help)
+                show_help
+                exit 0
+                ;;
+            -v|--version)
+                show_version
+                exit 0
+                ;;
+            *)
+                TARGETS+=("$arg")
+                ;;
+        esac
     done
-fi
 
+    if [[ ${#TARGETS[@]} -eq 0 ]]; then
+        echo "エラー: フォントファイルまたはディレクトリを指定してください。" >&2
+        exit 1
+    fi
+
+    # --- フォントディレクトリ準備 ---
+    mkdir -p "$FONT_DIR"
+
+    # --- コピー処理 ---
+    for target in "${TARGETS[@]}"; do
+        if [[ -f "$target" ]]; then
+            if is_font_file "$target"; then
+                copy_font "$target"
+            else
+                echo "スキップ (対象外の拡張子): $target"
+            fi
+        elif [[ -d "$target" ]]; then
+            # ディレクトリ内を再帰的に検索し、対象拡張子のみコピー
+            while IFS= read -r -d '' font_file; do
+                copy_font "$font_file"
+            done < <(find "$target" -type f \( \
+                -iname "*.ttf" -o \
+                -iname "*.otf" -o \
+                -iname "*.ttc" -o \
+                -iname "*.otc" -o \
+                -iname "*.woff" -o \
+                -iname "*.woff2" \
+            \) -print0)
+        else
+            echo "警告: 見つかりません、スキップします: $target" >&2
+        fi
+    done
+
+    # --- フォントキャッシュ更新 ---
+    echo "フォントキャッシュを更新しています..."
+    fc-cache -f -v
+
+    echo "完了しました。"
+
+    # --- インストールしたフォント一覧を表示 ---
+    if [[ ${#INSTALLED_FONTS[@]} -eq 0 ]]; then
+        echo "インストールされたフォントはありませんでした。"
+    else
+        echo ""
+        echo "インストールしたフォント (${#INSTALLED_FONTS[@]} 件):"
+        for f in "${INSTALLED_FONTS[@]}"; do
+            echo "  - $f"
+        done
+    fi
+}
+
+main "$@"
