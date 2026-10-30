@@ -31,8 +31,8 @@
 ### unix/ (bash)
 
 - bash スクリプトの shebang は `#!/bin/bash` を使用(`build_unix.sh` は `#!/bin/sh`)
-- 処理は `main()` にまとめ、ファイル末尾の `main "$@"` から実行する
 - 文字列処理は `sed` / `awk` / `cut` などの標準ツールを使う
+- 関数が複数ある長いスクリプト (`install-fonts.sh`) は `main()` にまとめ、末尾の `main "$@"` から実行する (短いスクリプトは不要)
 - Perl スクリプト(`.pl`)も `unix/` に置き、`build_unix.sh` が拡張子なしで `.bin/` へコピーする
 - Perl スクリプトは `sub main` に処理をまとめ、ファイル末尾の `main();` から実行する
 - `cd` のように親シェルへ作用する関数は `unix/shell/functions.sh` に定義し、`~/.bashrc` で source する(bash のみ対応)
