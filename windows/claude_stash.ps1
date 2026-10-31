@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('stash', 'restore', 'list', '--help')]
+    [ValidateSet('stash', 'restore', 'list', 's', 'r', 'l', '--help')]
     [string]$Command,
 
     [Parameter(Position = 1, ValueFromRemainingArguments = $true)]
@@ -21,9 +21,9 @@ function Show-Usage {
     @"
 使い方:
   claude_stash.ps1 -h | --help               # このヘルプを表示
-  claude_stash.ps1 stash <dir1> [dir2 ...]   # ディレクトリを退避
-  claude_stash.ps1 restore [dir1 ...]        # 退避したディレクトリを元に戻す（省略時は全部）
-  claude_stash.ps1 list                      # 退避中の一覧を表示
+  claude_stash.ps1 stash|s <dir1> [dir2 ...] # ディレクトリを退避
+  claude_stash.ps1 restore|r [dir1 ...]      # 退避したディレクトリを元に戻す（省略時は全部）
+  claude_stash.ps1 list|l                    # 退避中の一覧を表示
 
 退避先: $StashDir
 
@@ -171,12 +171,12 @@ function Main {
     if ($Help -or $Command -eq '--help') { Show-Usage -Code 0 }
 
     switch ($Command) {
-        'stash' {
+        { $_ -in 'stash', 's' } {
             if (-not $Paths -or $Paths.Count -eq 0) { Show-Usage }
             Invoke-Stash -Dirs $Paths
         }
-        'restore' { Invoke-Restore -Targets $Paths }
-        'list'    { Show-List }
+        { $_ -in 'restore', 'r' } { Invoke-Restore -Targets $Paths }
+        { $_ -in 'list', 'l' }    { Show-List }
         default   { Show-Usage }
     }
 }

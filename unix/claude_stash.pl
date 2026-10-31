@@ -23,9 +23,9 @@ sub usage {
     print <<"USAGE";
 使い方:
   $0 -h | --help               # このヘルプを表示
-  $0 stash <dir1> [dir2 ...]   # ディレクトリを退避
-  $0 restore [dir1 ...]        # 退避したディレクトリを元に戻す（省略時は全部）
-  $0 list                      # 退避中の一覧を表示
+  $0 stash|s <dir1> [dir2 ...] # ディレクトリを退避
+  $0 restore|r [dir1 ...]      # 退避したディレクトリを元に戻す（省略時は全部）
+  $0 list|l                    # 退避中の一覧を表示
 
 退避先: $STASH_DIR
 
@@ -45,12 +45,12 @@ sub main {
 
     my $cmd = shift @ARGV or usage();
 
-    if ($cmd eq 'stash') {
+    if ($cmd eq 'stash' || $cmd eq 's') {
         usage() unless @ARGV;
         do_stash(@ARGV);
-    } elsif ($cmd eq 'restore') {
+    } elsif ($cmd eq 'restore' || $cmd eq 'r') {
         do_restore(@ARGV);
-    } elsif ($cmd eq 'list') {
+    } elsif ($cmd eq 'list' || $cmd eq 'l') {
         do_list();
     } else {
         usage();
